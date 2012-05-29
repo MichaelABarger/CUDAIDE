@@ -1,3 +1,4 @@
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,16 +37,20 @@ public class ArrowCanvas extends Canvas {
 		if ( this.rightside == null || this.leftside == null )
 			return;
 		
-		y1 += leftside.y;
-		y2 += leftside.y;
+		y1 += this.leftside.y;
+		y2 += this.leftside.y;
 		int x1 = this.leftside.x + this.leftside.width;
 		
 		if ( this.cur_y1 != -1 && this.cur_y2 != -1 ) {
-			gc.setBackground( background );
-			gc.fillPolygon( new int[] { x1, this.cur_y2, x1, this.cur_y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+			this.gc.setAntialias( SWT.ON );
+			this.gc.setBackground( background );
+			this.gc.fillPolygon( new int[] { x1, this.cur_y2, x1, this.cur_y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+			this.gc.setAntialias( SWT.OFF );
 		}
-		gc.setBackground( orange );
-		gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+		this.gc.setAntialias( SWT.ON );
+		this.gc.setBackground( orange );
+		this.gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+		this.gc.setAntialias( SWT.OFF );
 		
 		this.cur_y1 = y1;
 		this.cur_y2 = y2;

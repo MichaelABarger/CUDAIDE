@@ -58,16 +58,18 @@ public class CUDAGauge extends Canvas {
 		Point needle[] = new Point[] { new Point( 0, -CUDAGauge.needle_length ), new Point( -5, 0 ), new Point( 0, 10 ), new Point( 5, 0 ) };
 		double transform[][] = new double[][] { { Math.cos(angle), -Math.sin(angle) }, { Math.sin(angle), Math.cos(angle) } };
 		Point new_needle[] = new Point[4];
-		Point pivot = adjustCoords( new Point( -1, -1 ) ); 
+		Point pivot = adjustCoords( new Point( -5, -5 ) ); 
 		
 		for ( int i = 0; i < 4; i++ )
 			new_needle[i] = adjustCoords( rotate( needle[i], transform ) );
 		
 		this.graphics.drawImage( this.gauge_img, 0, 0 );
+		this.graphics.setAntialias( SWT.ON );
 		this.graphics.setBackground( this.red );
 		this.graphics.fillPolygon( new int[] { new_needle[0].x, new_needle[0].y, new_needle[1].x, new_needle[1].y, new_needle[2].x, new_needle[2].y, new_needle[3].x, new_needle[3].y } );
 		this.graphics.setBackground( this.gray );
 		this.graphics.fillOval( pivot.x, pivot.y, 4, 4 );
+		this.graphics.setAntialias( SWT.OFF );
 		this.graphics.drawImage( this.shiny_img, 0, 0 );
 		
 		this.cur_needle_pos = value;

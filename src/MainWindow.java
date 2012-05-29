@@ -8,15 +8,12 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CaretEvent;
-import org.eclipse.swt.custom.CaretListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -25,10 +22,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.layout.RowData;
 
 
 
