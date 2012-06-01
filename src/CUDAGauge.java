@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Timer;
 
 import org.eclipse.swt.SWT;
@@ -114,7 +115,7 @@ public class CUDAGauge extends Canvas {
 	
 	public void setGaugeType( String gauge_type ) {
 		
-		this.gauge_img = new Image( this.display, "res/gauge-" + gauge_type + ".png" );
+		this.gauge_img = new Image( this.display, "res" + File.separator + "gauge-" + gauge_type + ".png" );
 		
 	}
 	
