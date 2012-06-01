@@ -27,13 +27,7 @@ public class CUDAGauge extends Canvas {
 	
 	public CUDAGauge( Composite parent, int flags ) {
 		super( parent, SWT.NO_BACKGROUND );
-		// don't do this.
-	}
-	
-	public CUDAGauge( Composite parent, String gauge_type ) {
-		super( parent, SWT.NO_BACKGROUND );
 		this.display = this.getDisplay();
-		this.gauge_img = new Image( this.display, "res/gauge-" + gauge_type + ".png" );
 		this.shiny_img = new Image( this.display, "res/shiny.png" );
 		this.red = new Color( this.display, 220, 0, 0 );
 		this.gray = new Color( this.display, 160, 160, 160 );
@@ -50,6 +44,12 @@ public class CUDAGauge extends Canvas {
 			}
 			
 		});
+		
+	}
+	
+	public void setGaugeType( String gauge_type ) {
+		
+		this.gauge_img = new Image( this.display, "res/gauge-" + gauge_type + ".png" );
 		
 	}
 	

@@ -90,23 +90,26 @@ public class MainWindow {
 		composite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(composite);
 		
-		CUDAGauge occupancyGauge = new CUDAGauge(composite, "occupancy" );
+		CUDAGauge occupancyGauge = new CUDAGauge(composite, SWT.NONE );
+		occupancyGauge.setGaugeType( "occupancy" );
 		occupancyGauge.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(occupancyGauge);
 		occupancyGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(occupancyGauge);
 		
-		CUDAGauge incoherentGauge = new CUDAGauge(composite, "incoherent" );
+		CUDAGauge incoherentGauge = new CUDAGauge(composite, SWT.NONE );
+		incoherentGauge.setGaugeType( "incoherent" );
 		incoherentGauge.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(incoherentGauge);
 		incoherentGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(incoherentGauge);
 		
-		CUDAGauge bankconfictGauge = new CUDAGauge(composite, "bankconflicts" );
-		bankconfictGauge.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(bankconfictGauge);
-		bankconfictGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(bankconfictGauge);
+		CUDAGauge bankconflictGauge = new CUDAGauge(composite, SWT.NONE );
+		bankconflictGauge.setGaugeType( "bankconflicts" );
+		bankconflictGauge.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(bankconflictGauge);
+		bankconflictGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(bankconflictGauge);
 		
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication, "CUDA CODE", SWT.NONE);
 		lblCudaCode.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
