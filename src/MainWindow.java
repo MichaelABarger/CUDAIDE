@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 
 
@@ -31,7 +33,7 @@ public class MainWindow {
 	private static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private static Chart history;
-	private static Button btnRecompile;
+	private static CUDARecompileButton btnRecompile;
 	private static CUDACode ppCUDACode;
 	
 	/**
@@ -97,12 +99,12 @@ public class MainWindow {
 		occupancyGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(occupancyGauge);
 		
-		CUDAGauge incoherentGauge = new CUDAGauge(composite, SWT.NONE );
-		incoherentGauge.setGaugeType( "incoherent" );
-		incoherentGauge.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(incoherentGauge);
-		incoherentGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(incoherentGauge);
+		CUDAGauge uncoalescedGauge = new CUDAGauge(composite, SWT.NONE );
+		uncoalescedGauge.setGaugeType( "uncoalesced" );
+		uncoalescedGauge.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(uncoalescedGauge);
+		uncoalescedGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(uncoalescedGauge);
 		
 		CUDAGauge bankconflictGauge = new CUDAGauge(composite, SWT.NONE );
 		bankconflictGauge.setGaugeType( "bankconflicts" );
@@ -183,7 +185,7 @@ public class MainWindow {
 		new Label(shlSwtApplication, SWT.NONE);
 		new Label(shlSwtApplication, SWT.NONE);
 		
-		btnRecompile = new Button(shlSwtApplication, SWT.NONE);
+		btnRecompile = new CUDARecompileButton(shlSwtApplication, SWT.NONE);
 		btnRecompile.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 		btnRecompile.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		GridData gd_btnRecompile = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
@@ -191,6 +193,10 @@ public class MainWindow {
 		btnRecompile.setLayoutData(gd_btnRecompile);
 		formToolkit.adapt(btnRecompile, true, true);
 		btnRecompile.setText("RECOMPILE");
+		btnRecompile.addGauge( occupancyGauge );
+		btnRecompile.addGauge( uncoalescedGauge );
+		btnRecompile.addGauge( bankconflictGauge );
+		
 
 		/*******************************************************************
 		 * END WINDOW CONTROL DECLARATIONS

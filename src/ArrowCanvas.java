@@ -42,19 +42,24 @@ public class ArrowCanvas extends Canvas {
 		y2 += this.leftside.y;
 		int x1 = this.leftside.x + this.leftside.width;
 		
-		if ( this.cur_y1 != -1 && this.cur_y2 != -1 ) {
-			this.gc.setAntialias( SWT.ON );
-			this.gc.setBackground( background );
-			this.gc.fillPolygon( new int[] { x1, this.cur_y2, x1, this.cur_y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
-			this.gc.setAntialias( SWT.OFF );
-		}
-		this.gc.setAntialias( SWT.ON );
-		this.gc.setBackground( orange );
-		this.gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
-		this.gc.setAntialias( SWT.OFF );
+		if ( this.cur_y1 != y1 && this.cur_y2 != y2 ) {
+			
+			if ( this.cur_y1 != -1 && this.cur_y2 != -1 ) {
+				this.gc.setAntialias( SWT.ON );
+				this.gc.setBackground( background );
+				this.gc.fillPolygon( new int[] { x1, this.cur_y2 + 1, x1, this.cur_y1 - 1, rightside.x, rightside.y - 1, rightside.x, rightside.y + rightside.height + 1 } );
+				this.gc.setAntialias( SWT.OFF );
+			}
 		
-		this.cur_y1 = y1;
-		this.cur_y2 = y2;
+			this.gc.setAntialias( SWT.ON );
+			this.gc.setBackground( orange );
+			this.gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+			this.gc.setAntialias( SWT.OFF );
+			
+			this.cur_y1 = y1;
+			this.cur_y2 = y2;
+		}
+		
 	}
 	
 	public void finalize() throws Throwable {
