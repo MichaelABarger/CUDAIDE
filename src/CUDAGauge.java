@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 
+
+
 public class CUDAGauge extends Canvas {
 	Image gauge_img;
 	Image shiny_img;
@@ -34,7 +36,7 @@ public class CUDAGauge extends Canvas {
 		this.gauge_img = new Image( this.display, "res/gauge-" + gauge_type + ".png" );
 		this.shiny_img = new Image( this.display, "res/shiny.png" );
 		this.red = new Color( this.display, 220, 0, 0 );
-		this.gray = new Color( this.display, 120, 120, 120 );
+		this.gray = new Color( this.display, 160, 160, 160 );
 		
 		this.graphics = new GC( this );
 		this.cur_needle_pos = 50;
@@ -58,7 +60,7 @@ public class CUDAGauge extends Canvas {
 		Point needle[] = new Point[] { new Point( 0, -CUDAGauge.needle_length ), new Point( -5, 0 ), new Point( 0, 10 ), new Point( 5, 0 ) };
 		double transform[][] = new double[][] { { Math.cos(angle), -Math.sin(angle) }, { Math.sin(angle), Math.cos(angle) } };
 		Point new_needle[] = new Point[4];
-		Point pivot = adjustCoords( new Point( -5, -5 ) ); 
+		Point pivot = adjustCoords( new Point( -3, -3 ) ); 
 		
 		for ( int i = 0; i < 4; i++ )
 			new_needle[i] = adjustCoords( rotate( needle[i], transform ) );
@@ -68,7 +70,7 @@ public class CUDAGauge extends Canvas {
 		this.graphics.setBackground( this.red );
 		this.graphics.fillPolygon( new int[] { new_needle[0].x, new_needle[0].y, new_needle[1].x, new_needle[1].y, new_needle[2].x, new_needle[2].y, new_needle[3].x, new_needle[3].y } );
 		this.graphics.setBackground( this.gray );
-		this.graphics.fillOval( pivot.x, pivot.y, 4, 4 );
+		this.graphics.fillOval( pivot.x, pivot.y, 6, 6 );
 		this.graphics.setAntialias( SWT.OFF );
 		this.graphics.drawImage( this.shiny_img, 0, 0 );
 		

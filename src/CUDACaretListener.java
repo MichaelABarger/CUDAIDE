@@ -4,6 +4,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 
+
+
 public class CUDACaretListener implements CaretListener {
 	int prev_line = 0;
 	Display display;

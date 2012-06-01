@@ -1,6 +1,7 @@
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+
+
 
 
 public final class CUDACode extends StyledText {
