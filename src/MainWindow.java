@@ -5,23 +5,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import java.util.Map;
-
+import org.eclipse.swt.custom.CaretEvent;
+import org.eclipse.swt.custom.CaretListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
@@ -30,13 +34,13 @@ import org.eclipse.swt.events.MouseEvent;
 
 public class MainWindow {
 	private static ProcessBuilder cur_pb;
-	private static Table table;
+	public static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(
 			Display.getDefault());
 	private static Chart history;
-	private static CUDARecompileButton btnRecompile;
-	private static CUDACode ppCUDACode;
-	private static PTXScanner ppPTXScanner;
+	private static Button btnRecompile;
+	public static CUDACode ppCUDACode;
+	public static PTXScanner ppPTXScanner;
 	public static int currentLine;
 	/**
 	 * Launch the application.
@@ -48,7 +52,6 @@ public class MainWindow {
 		/**********************************************************************************
 		 * BEGIN WINDOW CONTROL DECLARATIONS
 		 */
-		int n = 44;
 		Display display = Display.getDefault();
 		Shell shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
 		shlSwtApplication.setDragDetect(false);
@@ -165,8 +168,6 @@ public class MainWindow {
 		ppCUDACode.setLayoutData(gd_ppCUDACode);
 
 		// add custom event listeners
-		ppCUDACode.addCaretListener(new CUDACaretListener());
-		ppCUDACode.addPaintListener(new CUDAPaintListener());
 		
 		ArrowCanvas canvas_1 = new ArrowCanvas(shlSwtApplication, SWT.NONE);
 		GridData gd_canvas_1 = new GridData(SWT.FILL, SWT.FILL, true, false, 1,
@@ -278,8 +279,6 @@ public class MainWindow {
 			ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
 			PTXpath.deleteOnExit();
 			
-			ChangeTable(n, table, tblclmnInstruction, tblclmnArgument, tblclmnArgument_1, tblclmnArgument_2);
-				
 			/**************** compile CU again into executable and run it for profiling ********************/
 			// set up command line
 			command.clear();
@@ -343,25 +342,4 @@ public class MainWindow {
 		}
 	}
 
-	public static void ChangeTable(int n, Table t, TableColumn a, TableColumn b, TableColumn c, TableColumn d)
-	{
-		t.removeAll();
-		String data [];
-		int w = 0;
-		w = ppPTXScanner.instructions(n);
-		System.out.println(Integer.toString(w));
-		for(int j = 0; j < w; j++){
-			data = new String[4];
-			TableItem tblInstructions = new TableItem(table, SWT.NONE); 
-			for(int i = 0; i < 4; i++){
-				data[i] = ppPTXScanner.getArg(n, j, i);
-				if(data[i] == null) data[i] = " ";
-			}
-			tblInstructions.setText(data);	
-		}
-		a.pack();
-		b.pack();
-		c.pack();
-		d.pack();
-	}
 }
