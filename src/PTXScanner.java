@@ -7,6 +7,7 @@ public class PTXScanner {
 	public CUDAPTXLine line[];
 	String source[];
 	int sourceLine[];
+	private int scope;
 
 	PTXScanner() {
 	}
@@ -25,8 +26,24 @@ public class PTXScanner {
 		return null;
 	}
 	
+	private void setScope()
+	{
+		int b = 0, c = 0;
+		for(int i = 0; i < line.length; i++){
+			if(line[i] != null) b = line[i].getLineNumber();
+			if (b > c) c = b;
+		}
+		scope = c;
+	}
+	
+	public int getScope()
+	{
+		return scope;
+	}
+	
 	public int instructions (int ln)
 	{
+		if(ln > line.length) return 0;
 		if(lnLookup(ln) == null)
 			return 0;
 		else
@@ -105,7 +122,8 @@ public class PTXScanner {
 	}
 
 	void connectSource(int f, String g) {
-		for (int i = 0; i < line.length; i++) {
+		int i;
+		for (i = 0; i < line.length; i++) {
 			if (line[i] != null)
 				if (line[i].locateSource(f))
 					line[i].normalizeSource(g);
@@ -141,6 +159,7 @@ public class PTXScanner {
 		if(line[i] != null)
 			line[i].splitInstructions();
 		}
+		setScope();
 	}
 	
 	public static void main(String args[]) {
