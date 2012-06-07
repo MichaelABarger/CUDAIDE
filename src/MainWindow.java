@@ -38,7 +38,7 @@ public class MainWindow {
 	private static final FormToolkit formToolkit = new FormToolkit(
 			Display.getDefault());
 	private static Chart history;
-	private static Button btnRecompile;
+	private static CUDARecompileButton btnRecompile;
 	public static CUDACode ppCUDACode;
 	public static PTXScanner ppPTXScanner;
 	public static int currentLine;
