@@ -111,7 +111,6 @@ class CUDAPTXLine {
 		else{
 			for(int i = 0; i < PTXInstruction.length; i++){
 				Token = PTXInstruction[i].split("\\s");
-				int offset = 0;
 				for(int j = 0; j < Token.length; j++){
 					if(Token[j].length() > 0){
 						if(InstructionToken[i] == null)	InstructionToken[i] = Token[j];

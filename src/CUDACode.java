@@ -110,7 +110,6 @@ import org.eclipse.swt.widgets.TableItem;
 					this.bounds = parent.getBounds();
 				}
 
-				
 				int caret_pos = parent.getCaretOffset();
 				int cur_line = parent.getLineAtOffset( caret_pos );
 				int line_pixel = parent.getLinePixel( cur_line );
