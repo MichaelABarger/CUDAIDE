@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * Drawable canvas for visual profiler tool
@@ -55,13 +54,13 @@ public class CanvasGPU extends Canvas implements MouseListener, MouseMoveListene
 		
 		try {
 			
-			ImageData image_data_global = new ImageData( "drawing.png" );
+			ImageData image_data_global = new ImageData( "Calculator.png" );
 
 			Image image_global = new Image(  this.getDisplay(), image_data_global );
 
 			GC gc = new GC( this );
 
-			gc.drawImage( image_global, 100, 10);
+			gc.drawImage( image_global, 10, 10);
 
 			image_global.dispose();
 
