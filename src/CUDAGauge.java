@@ -111,7 +111,7 @@ public class CUDAGauge extends Canvas {
 		}
 		
 	}
-	
+	 
 	
 	public void setGaugeType( String gauge_type ) {
 		
