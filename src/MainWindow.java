@@ -31,6 +31,8 @@ public class MainWindow {
 	public static CUDACode ppCUDACode;
 	public static PTXScanner ppPTXScanner;
 	public static int currentLine;
+	public static String CUfilename;
+	public static File CUpath;
 	/**
 	 * Launch the application.
 	 * 
@@ -231,67 +233,13 @@ public class MainWindow {
 						"usage: CUDAIDE filename.cu [other files needed for compilation]");
 
 			// open and read the CU file
-			File CUpath = new File(args[0]);
+			CUpath = new File(args[0]);
 			if (!CUpath.exists())
 				throw new IOException(CUpath.getPath() + " does not exist!");
-			String CUfilename = CUpath.getName();
+			CUfilename = CUpath.getName();
 
-			/*************** compile CU into commented PTX *****************/
-			// build command line and execute
-			ArrayList<String> command = new ArrayList<String>(Arrays.asList(
-					"nvcc", "-ptx", "-Xopencc=\"-LIST:source=on\" -O0",
-					"-Xptxas=-O0"));
-			command.addAll(Arrays.asList(args));
-			Runtime rt = Runtime.getRuntime();
-
-			cur_pb = new ProcessBuilder(command);
-
-			Process cur_p = cur_pb.start();
-
-			if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
-				BufferedReader stderr = new BufferedReader(
-						new InputStreamReader(cur_p.getErrorStream()));
-				String err = "";
-				String err_in;
-				while ((err_in = stderr.readLine()) != null)
-					err += err_in;
-				throw new IOException("Compile failed: " + err);
-			}
-
-			// create File object for the newly-generated PTX file and make it
-			// temporary
-			File PTXpath = new File(CUfilename.substring(0,
-					CUfilename.length() - 3).concat(".ptx"));
-			if (!PTXpath.exists())
-				throw new IOException(PTXpath.getPath() + " does not exist!");
-			ppPTXScanner = new PTXScanner(); 
-			ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-			PTXpath.deleteOnExit();
-			
-			/**************** compile CU again into executable and run it for profiling ********************/
-			// set up command line
-			command.clear();
-			command.addAll(Arrays.asList("nvcc", "-run"));
-			command.addAll(Arrays.asList(args));
-			// execute NVCC and run the program
-			cur_pb = new ProcessBuilder(command);
-
-			Map<String, String> env = cur_pb.environment();
-			env.put("COMPUTE_PROFILE", "1");
-			env.put("COMPUTE_PROFILE_LOG", "cudaide.log");
-			env.put("COMPUTE_PROFILE_CONFIG", "config");
-			cur_pb.redirectErrorStream();
-			cur_p = cur_pb.start();
-			BufferedReader stdin = new BufferedReader(new InputStreamReader(
-					cur_p.getInputStream()));
-			BufferedReader stderr = new BufferedReader(new InputStreamReader(
-					cur_p.getErrorStream()));
-			String in = "";
-			String in_in;
-			while ((in_in = stdin.readLine()) != null)
-				in += in_in;
-			System.out.println(in);
-
+			compile(args);
+		
 			shlSwtApplication.open();
 			shlSwtApplication.layout();
 
@@ -331,4 +279,63 @@ public class MainWindow {
 		}
 	}
 
+	public static void compile(String [] args) throws IOException, InterruptedException
+	{
+		/*************** compile CU into commented PTX *****************/
+		// build command line and execute
+		ArrayList<String> command = new ArrayList<String>(Arrays.asList(
+				"nvcc", "-ptx", "-Xopencc=\"-LIST:source=on\" -O0",
+				"-Xptxas=-O0"));
+		command.addAll(Arrays.asList(args));
+		Runtime rt = Runtime.getRuntime();
+
+		cur_pb = new ProcessBuilder(command);
+
+		Process cur_p = cur_pb.start();
+
+		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
+			BufferedReader stderr = new BufferedReader(
+					new InputStreamReader(cur_p.getErrorStream()));
+			String err = "";
+			String err_in;
+			while ((err_in = stderr.readLine()) != null)
+				err += err_in;
+			throw new IOException("Compile failed: " + err);
+		}
+
+		// create File object for the newly-generated PTX file and make it
+		// temporary
+		File PTXpath = new File(CUfilename.substring(0,
+				CUfilename.length() - 3).concat(".ptx"));
+		if (!PTXpath.exists())
+			throw new IOException(PTXpath.getPath() + " does not exist!");
+		ppPTXScanner = new PTXScanner(); 
+		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
+		PTXpath.deleteOnExit();
+		
+		/**************** compile CU again into executable and run it for profiling ********************/
+		// set up command line
+		command.clear();
+		command.addAll(Arrays.asList("nvcc", "-run"));
+		command.addAll(Arrays.asList(args));
+		// execute NVCC and run the program
+		cur_pb = new ProcessBuilder(command);
+
+		Map<String, String> env = cur_pb.environment();
+		env.put("COMPUTE_PROFILE", "1");
+		env.put("COMPUTE_PROFILE_LOG", "cudaide.log");
+		env.put("COMPUTE_PROFILE_CONFIG", "config");
+		cur_pb.redirectErrorStream();
+		cur_p = cur_pb.start();
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(
+				cur_p.getInputStream()));
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+				cur_p.getErrorStream()));
+		String in = "";
+		String in_in;
+		while ((in_in = stdin.readLine()) != null)
+			in += in_in;
+		System.out.println(in);
+
+	}
 }
