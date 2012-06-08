@@ -7,8 +7,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.eclipse.swt.widgets.Display;
 import java.util.Map;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -18,22 +25,23 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
 
 public class MainWindow {
-	private static ProcessBuilder cur_pb;
 	public static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(
 			Display.getDefault());
 	private static Chart history;
-	private static CUDARecompileButton btnRecompile;
+	private static Button btnRecompile;
 	public static CUDACode ppCUDACode;
 	public static PTXScanner ppPTXScanner;
 	public static int currentLine;
 	public static String CUfilename;
 	public static File CUpath;
 	public static File PTXpath;
+	public static Display display;
 	public static CUDAGauge uncoalesced;
 	public static CUDAGauge occupancy;
 	public static CUDAGauge conflicts;
@@ -47,7 +55,7 @@ public class MainWindow {
 		/**********************************************************************************
 		 * BEGIN WINDOW CONTROL DECLARATIONS
 		 */
-		Display display = Display.getDefault();
+		display = Display.getDefault();
 		Shell shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
 		shlSwtApplication.setDragDetect(false);
 		shlSwtApplication.setBackground(SWTResourceManager
@@ -215,6 +223,52 @@ public class MainWindow {
 		btnRecompile.setLayoutData(gd_btnRecompile);
 		formToolkit.adapt(btnRecompile, true, true);
 		btnRecompile.setText("RECOMPILE");
+		btnRecompile.addMouseListener(new MouseAdapter() {
+			
+			public void mouseDown(MouseEvent e) {
+				
+				final File audio_file = new File( "res" + File.separator + "ding.wav" );
+				
+				String [] compileArgs = new String[1];
+				compileArgs[0] = MainWindow.CUpath.getPath();
+				try {
+					MainWindow.compile(compileArgs);
+				} catch (Exception x) {
+					/*
+					 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
+					 * "Fatal Error" ); mb.setMessage( e.getMessage() ); mb.open();
+					 */
+					
+//					System.out.println(MainWindow.cur_pb.directory());			
+//					System.out.println(MainWindow.cur_pb.environment());			
+//					System.out.println(MainWindow.cur_pb.command());
+
+					System.err.println(x.getMessage());
+					MainWindow.display.dispose();
+					System.exit(1);
+				} finally {
+
+				}
+				// set gauges to random values
+			//		MainWindow.conflicts.setNeedle((int)Math.random() * 100);
+		//			MainWindow.uncoalesced.setNeedle(25);
+	//				MainWindow.occupancy.moveNeedleTo((int)Math.random() * 100);
+				
+				// play sound
+
+				try {
+					AudioInputStream au = AudioSystem.getAudioInputStream( audio_file );
+					Clip clip = AudioSystem.getClip();
+					
+					clip.open( au );
+					clip.start();
+					
+				} catch ( Exception ex ) {
+					// do nothing--no sound is okay, too
+				}
+			}
+			
+		});
 		
 
 		/*******************************************************************
@@ -239,32 +293,20 @@ public class MainWindow {
 				throw new IOException(CUpath.getPath() + " does not exist!");
 			CUfilename = CUpath.getName();
 
-			compile(args);
-		
+			compile(args);	
+			
 			shlSwtApplication.open();
 			shlSwtApplication.layout();
-
 			canvas_1.setDimensions(ppCUDACode.getBounds(), table.getBounds());
-
-			BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
-			String cudacode = "";
-			String cudacode_in;
-			while ((cudacode_in = CUcode.readLine()) != null)
-				cudacode += cudacode_in + "\n";
-			ppCUDACode.setText(cudacode);
-			ppCUDACode.resetCaret();
-
-			CUcode.close();
-
 		} catch (Throwable e) {
 			/*
 			 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
 			 * "Fatal Error" ); mb.setMessage( e.getMessage() ); mb.open();
 			 */
 			
-			System.out.println(cur_pb.directory());			
-			System.out.println(cur_pb.environment());			
-			System.out.println(cur_pb.command());
+//			System.out.println(cur_pb.directory());			
+//			System.out.println(cur_pb.environment());			
+//			System.out.println(cur_pb.command());
 
 			System.err.println(e.getMessage());
 			display.dispose();
@@ -290,7 +332,7 @@ public class MainWindow {
 		command.addAll(Arrays.asList(args));
 		Runtime rt = Runtime.getRuntime();
 
-		cur_pb = new ProcessBuilder(command);
+		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
 		Process cur_p = cur_pb.start();
 
@@ -337,6 +379,14 @@ public class MainWindow {
 		while ((in_in = stdin.readLine()) != null)
 			in += in_in;
 		System.out.println(in);
+		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
+		String cudacode = "";
+		String cudacode_in;
+		while ((cudacode_in = CUcode.readLine()) != null)
+			cudacode += cudacode_in + "\n";
+		ppCUDACode.setText(cudacode);
+		ppCUDACode.resetCaret();
 
+		CUcode.close();		
 	}
 }

@@ -15,41 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 public class CUDARecompileButton extends Button {
 	
 	private MainWindow parent;
-	static private File audio_file = new File( "res" + File.separator + "ding.wav" );
 	
 	public CUDARecompileButton( Composite parent, int flags ) {
 		
 		super( parent, flags );
-		
-		this.addMouseListener(new MouseAdapter() {
-			
-			CUDARecompileButton parent;
-			
-			public void mouseDown(MouseEvent e) {
-				
-				if ( this.parent == null )
-					this.parent = (CUDARecompileButton)e.getSource();
-				
-				// set gauges to random values
-					MainWindow.conflicts.setNeedle((int)Math.random() * 100);
-		//			MainWindow.uncoalesced.setNeedle(25);
-	//				MainWindow.occupancy.moveNeedleTo((int)Math.random() * 100);
-				
-				// play sound
-
-				try {
-					AudioInputStream au = AudioSystem.getAudioInputStream( CUDARecompileButton.audio_file );
-					Clip clip = AudioSystem.getClip();
-					
-					clip.open( au );
-					clip.start();
-					
-				} catch ( Exception ex ) {
-					// do nothing--no sound is okay, too
-				}
-			}
-			
-		});
 		
 	}
 	
