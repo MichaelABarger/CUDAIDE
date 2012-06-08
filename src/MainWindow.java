@@ -33,6 +33,10 @@ public class MainWindow {
 	public static int currentLine;
 	public static String CUfilename;
 	public static File CUpath;
+	public static File PTXpath;
+	public static CUDAGauge uncoalesced;
+	public static CUDAGauge occupancy;
+	public static CUDAGauge conflicts;
 	/**
 	 * Launch the application.
 	 * 
@@ -101,27 +105,27 @@ public class MainWindow {
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(composite);
 
-		CUDAGauge occupancyGauge = new CUDAGauge(composite, SWT.NONE);
-		occupancyGauge.setGaugeType("occupancy");
-		occupancyGauge.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(occupancyGauge);
-		occupancyGauge.setBackground(SWTResourceManager
+		occupancy = new CUDAGauge(composite, SWT.NONE);
+		occupancy.setGaugeType("occupancy");
+		occupancy.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(occupancy);
+		occupancy.setBackground(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(occupancyGauge);
-		CUDAGauge uncoalescedGauge = new CUDAGauge(composite, SWT.NONE );
-		uncoalescedGauge.setGaugeType( "uncoalesced" );
-		uncoalescedGauge.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(uncoalescedGauge);
-		uncoalescedGauge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(uncoalescedGauge);
+		formToolkit.paintBordersFor(occupancy);
+		uncoalesced = new CUDAGauge(composite, SWT.NONE );
+		uncoalesced.setGaugeType( "uncoalesced" );
+		uncoalesced.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(uncoalesced);
+		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(uncoalesced);
 		
-		CUDAGauge bankconflictGauge = new CUDAGauge(composite, SWT.NONE );
-		bankconflictGauge.setGaugeType( "bankconflicts" );
-		bankconflictGauge.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(bankconflictGauge);
-		bankconflictGauge.setBackground(SWTResourceManager
+		conflicts = new CUDAGauge(composite, SWT.NONE );
+		conflicts.setGaugeType( "bankconflicts" );
+		conflicts.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(conflicts);
+		conflicts.setBackground(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(bankconflictGauge);
+		formToolkit.paintBordersFor(conflicts);
 
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,
 				"CUDA CODE", SWT.NONE);
@@ -211,9 +215,6 @@ public class MainWindow {
 		btnRecompile.setLayoutData(gd_btnRecompile);
 		formToolkit.adapt(btnRecompile, true, true);
 		btnRecompile.setText("RECOMPILE");
-		btnRecompile.addGauge( occupancyGauge );
-		btnRecompile.addGauge( uncoalescedGauge );
-		btnRecompile.addGauge( bankconflictGauge );
 		
 
 		/*******************************************************************
@@ -305,7 +306,7 @@ public class MainWindow {
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
-		File PTXpath = new File(CUfilename.substring(0,
+		PTXpath = new File(CUfilename.substring(0,
 				CUfilename.length() - 3).concat(".ptx"));
 		if (!PTXpath.exists())
 			throw new IOException(PTXpath.getPath() + " does not exist!");

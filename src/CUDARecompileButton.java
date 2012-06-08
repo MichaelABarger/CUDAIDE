@@ -14,16 +14,12 @@ import org.eclipse.swt.widgets.Composite;
 
 public class CUDARecompileButton extends Button {
 	
-	private List< CUDAGauge > gauges;
 	private MainWindow parent;
 	static private File audio_file = new File( "res" + File.separator + "ding.wav" );
-	
 	
 	public CUDARecompileButton( Composite parent, int flags ) {
 		
 		super( parent, flags );
-		
-		this.gauges = new ArrayList< CUDAGauge >();
 		
 		this.addMouseListener(new MouseAdapter() {
 			
@@ -35,11 +31,12 @@ public class CUDARecompileButton extends Button {
 					this.parent = (CUDARecompileButton)e.getSource();
 				
 				// set gauges to random values
-				for ( CUDAGauge g : this.parent.gauges ) {
-					g.moveNeedleTo( (int)(Math.random() * 100) );
-				}
+					MainWindow.conflicts.setNeedle((int)Math.random() * 100);
+		//			MainWindow.uncoalesced.setNeedle(25);
+	//				MainWindow.occupancy.moveNeedleTo((int)Math.random() * 100);
 				
 				// play sound
+
 				try {
 					AudioInputStream au = AudioSystem.getAudioInputStream( CUDARecompileButton.audio_file );
 					Clip clip = AudioSystem.getClip();
@@ -53,12 +50,6 @@ public class CUDARecompileButton extends Button {
 			}
 			
 		});
-		
-	}
-	
-	public void addGauge( CUDAGauge new_gauge ) {
-		
-		this.gauges.add( new_gauge );
 		
 	}
 	

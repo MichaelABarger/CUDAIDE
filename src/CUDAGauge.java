@@ -52,7 +52,6 @@ public class CUDAGauge extends Canvas {
 		
 		this.setNeedle( 50 );
 		
-		
 		this.addPaintListener( new PaintListener() {
 			CUDAGauge parent;
 			public void paintControl(PaintEvent e) {
@@ -62,6 +61,7 @@ public class CUDAGauge extends Canvas {
 			}
 		
 		});
+
 		
 		
 	}
