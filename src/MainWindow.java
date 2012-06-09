@@ -45,6 +45,7 @@ public class MainWindow {
 	public static CUDAGauge uncoalesced;
 	public static CUDAGauge occupancy;
 	public static CUDAGauge conflicts;
+	public static ProfileMap pMap;
 	/**
 	 * Launch the application.
 	 * 
@@ -213,7 +214,7 @@ public class MainWindow {
 		tblclmnArgument_2.setText("Argument 3");
 		new Label(shlSwtApplication, SWT.NONE);
 		new Label(shlSwtApplication, SWT.NONE);
-		btnRecompile = new CUDARecompileButton(shlSwtApplication, SWT.NONE);
+		btnRecompile = new Button(shlSwtApplication, SWT.NONE);
 		btnRecompile.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 		btnRecompile.setFont(SWTResourceManager
 				.getFont("Segoe UI", 9, SWT.BOLD));
@@ -232,6 +233,7 @@ public class MainWindow {
 				String [] compileArgs = new String[1];
 				compileArgs[0] = MainWindow.CUpath.getPath();
 				try {
+					MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
 					MainWindow.compile(compileArgs);
 				} catch (Exception x) {
 					/*
@@ -388,5 +390,6 @@ public class MainWindow {
 		ppCUDACode.resetCaret();
 
 		CUcode.close();		
+		pMap = new ProfileMap("cudaide.log");
 	}
 }

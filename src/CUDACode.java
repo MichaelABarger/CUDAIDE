@@ -7,6 +7,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import java.io.*;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.TableItem;
 					parent.setLineBackground( cur_line, 1, this.orange );
 					prev_line = cur_line;
 				}
+				MainWindow.table.removeAll();
 				if(cur_line < MainWindow.ppPTXScanner.getScope())
 					ChangeTable(cur_line + 1);
 		//		else System.out.println(Integer.toString(cur_line) + " is out of CUDA scope (" + Integer.toString(MainWindow.ppPTXScanner.getScope()) + ")");
@@ -70,7 +72,6 @@ import org.eclipse.swt.widgets.TableItem;
 			
 			public void ChangeTable(int n/*TableColumn a, TableColumn b, TableColumn c, TableColumn d*/)
 			{
-				MainWindow.table.removeAll();
 				String data [];
 				int w = 0;
 				w = MainWindow.ppPTXScanner.instructions(n);
@@ -89,6 +90,13 @@ import org.eclipse.swt.widgets.TableItem;
 //				d.pack();
 			}
 		}
+		
+		public void save(String filename) throws IOException {
+			BufferedWriter s = new BufferedWriter(new FileWriter(filename));
+			s.write(this.getText());
+			s.close();
+		}
+		
 		public class CUDAPaintListener implements PaintListener {
 			Display display;
 			CUDACode parent;

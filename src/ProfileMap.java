@@ -630,7 +630,22 @@ public class ProfileMap {
 		return profileMap;
 	}
 
-
+	public ProfileMap(String filename)
+	{
+		try{
+			FileReader in_file = new FileReader( filename );
+	
+			/** open file with buffered io */
+			BufferedReader in_f_read = new BufferedReader( in_file );	
+	
+			this.parse( in_f_read );
+	
+		} catch (Exception e) {
+			System.out.println( "file exception: " + e.getMessage() );
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * test: note is is best to use a fairly short log file or the console
 	 * output buffer is overrun.
