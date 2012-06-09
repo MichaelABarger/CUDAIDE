@@ -2,16 +2,18 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="var" path="SWT_LIB"/>
 	<classpathentry kind="lib" path="lib/org.swtchart_0.8.0.v20120301.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.ui.forms_3.5.101.v20111011-1919.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.core.runtime_3.7.0.v20110110.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.jface_3.7.0.v20110928-1505.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.osgi_3.7.2.v20120110-1415.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.jface.text_3.7.2.v20111213-1208.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.text_3.5.101.v20110928-1504.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.equinox.common_3.6.0.v20110523.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.equinox.app_1.3.100.v20110321.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pickles/Desktop/eclipse/plugins/org.eclipse.core.commands_3.6.0.I20110111-0800.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.core.runtime_3.7.0.v20110110.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.jface_3.7.0.v20110928-1505.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.osgi_3.7.2.v20120110-1415.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.jface.text_3.7.2.v20111213-1208.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.text_3.5.101.v20110928-1504.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.equinox.common_3.6.0.v20110523.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.equinox.app_1.3.100.v20110321.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.core.commands_3.6.0.I20110111-0800.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.ui.forms.source_3.5.101.v20111011-1919.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/org.eclipse.ui.forms_3.5.101.v20111011-1919.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/plugins/jcuda-0.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
