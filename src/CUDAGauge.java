@@ -53,17 +53,11 @@ public class CUDAGauge extends Canvas {
 		this.setNeedle( 50 );
 		
 		this.addPaintListener( new PaintListener() {
-			CUDAGauge parent;
 			public void paintControl(PaintEvent e) {
-				if ( this.parent == null )
-					this.parent = (CUDAGauge)e.getSource();
-				this.parent.draw();
+				CUDAGauge.this.draw();
 			}
 		
 		});
-
-		
-		
 	}
 
 	
