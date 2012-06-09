@@ -117,6 +117,31 @@ public class MainWindow {
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(composite);
 		
+		
+		occupancy = new CUDAGauge( composite, SWT.NONE );
+		occupancy.setGaugeType("occupancy");
+		occupancy.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(occupancy);
+		occupancy.setBackground(SWTResourceManager
+				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(occupancy);	
+		
+		uncoalesced = new CUDAGauge( composite, SWT.NONE );
+		uncoalesced.setGaugeType( "uncoalesced" );
+		uncoalesced.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(uncoalesced);
+		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(uncoalesced);
+		
+		conflicts = new CUDAGauge(composite, SWT.NONE );
+		conflicts.setGaugeType( "bankconflicts" );
+		conflicts.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(conflicts);
+		conflicts.setBackground(SWTResourceManager
+				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(conflicts);
+		
+		
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,
 				"CUDA CODE", SWT.NONE);
 		lblCudaCode.setBackground(SWTResourceManager
@@ -205,17 +230,21 @@ public class MainWindow {
 		btnRecompile.setLayoutData(gd_btnRecompile);
 		formToolkit.adapt(btnRecompile, true, true);
 		btnRecompile.setText("RECOMPILE");
+		
 		btnRecompile.addMouseListener(new MouseAdapter() {
 			
+			final File audio_file = new File( "res" + File.separator + "ding.wav" );
+			
 			public void mouseDown(MouseEvent e) {
-				
-				final File audio_file = new File( "res" + File.separator + "ding.wav" );
-				
 				String [] compileArgs = new String[1];
 				compileArgs[0] = MainWindow.CUpath.getPath();
 				try {
 					MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
 					MainWindow.compile(compileArgs);
+					occupancy.moveNeedleTo( (int)( Math.random() * 100 ) );
+					uncoalesced.moveNeedleTo( (int)( Math.random() * 100 ) );
+					conflicts.moveNeedleTo( (int)( Math.random() * 100 ) );
+					
 				} catch (Exception x) {
 					/*
 					 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
@@ -368,35 +397,14 @@ public class MainWindow {
 
 		CUcode.close();		
 		pMap = new ProfileMap("cudaide.log");
-		ChangeGauges();
+		ChangeGauges( 0, 0, 0 );
 	}
 		
-	public static void ChangeGauges()
+	public static void ChangeGauges( int occupancy_stat, int uncoalesced_stat, int conflicts_stat ) // each 0~100
 	{
-		occupancy = new CUDAGauge(composite, SWT.NONE, (int)(pMap.average("occupancy")*100));
-		occupancy.setGaugeType("occupancy");
-		occupancy.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(occupancy);
-		occupancy.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(occupancy);
-		
-		
-		uncoalesced = new CUDAGauge(composite, SWT.NONE, (int)(Math.random() * 100) );
-		uncoalesced.setGaugeType( "uncoalesced" );
-		uncoalesced.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(uncoalesced);
-		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(uncoalesced);
-		
-		conflicts = new CUDAGauge(composite, SWT.NONE );
-		conflicts.setGaugeType( "bankconflicts" );
-		conflicts.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(conflicts);
-		conflicts.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(conflicts);
-
+		occupancy.moveNeedleTo( occupancy_stat );
+		uncoalesced.moveNeedleTo( occupancy_stat );
+		conflicts.moveNeedleTo( occupancy_stat );
 	}
 }
 	
