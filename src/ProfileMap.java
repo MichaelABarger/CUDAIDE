@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +72,39 @@ public class ProfileMap {
 		profileMap = new HashMap<String, HashMap<Integer, String> >();
 	}
 	
+	/** 
+	 * constructor
+	 * 
+	 * @param filename
+	 */
+	public ProfileMap(String filename)
+	{
+		profileMap = new HashMap<String, HashMap<Integer, String> >();
+		
+
+//		System.out.println ( "Path at call to ProfileMap: " + System.getProperty("user.dir") + filename );
+//		System.out.println ( "Sep: " + System.getProperty("file.separator") );
+		
+		try{
+			File i_file = new File( filename );
+			
+			//FileReader in_file = new FileReader( System.getProperty("user.dir") + System.getProperty("file.separator") + filename);
+			
+			System.out.println( "filename : "  + i_file.getAbsolutePath() );
+			
+			FileReader in_file = new FileReader( i_file );
+			
+			/** open file with buffered io */
+			BufferedReader in_f_read = new BufferedReader( in_file );	
+			
+			this.parse( in_f_read );
+	
+		} catch (Exception e) {
+			System.out.println( "file exception: " + e.getMessage() );
+			e.printStackTrace();
+
+		}
+	}
 	
 	/**
 	 * Locates first line of profile data and reads file into data structure, 
@@ -90,7 +124,7 @@ public class ProfileMap {
 		try {
 			while( (str = in_f_read.readLine()) != null ){
 
-				//System.out.println( "str: " + str );
+				System.out.println( "str: " + str );
 
 				if( str.startsWith( sch ) ){
 
@@ -135,6 +169,8 @@ public class ProfileMap {
 					str_options = "";
 			}
 			else{
+				
+				System.out.println( "optionsString :" + str_options );
 				
 				/** make a new sub-HashMap for each option */
 				this.profileMap.put( str_options.substring( 0, option_len ), 
@@ -630,21 +666,7 @@ public class ProfileMap {
 		return profileMap;
 	}
 
-	public ProfileMap(String filename)
-	{
-		try{
-			FileReader in_file = new FileReader( filename );
-	
-			/** open file with buffered io */
-			BufferedReader in_f_read = new BufferedReader( in_file );	
-	
-			this.parse( in_f_read );
-	
-		} catch (Exception e) {
-			System.out.println( "file exception: " + e.getMessage() );
-			e.printStackTrace();
-		}
-	}
+
 	
 	/**
 	 * test: note is is best to use a fairly short log file or the console

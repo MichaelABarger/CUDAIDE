@@ -66,17 +66,35 @@ public class CUDAGauge extends Canvas {
 		
 	}
 	
-	
-	public void drawBackground(GC gc,
-            int x,
-            int y,
-            int width,
-            int height) {
+	public CUDAGauge( Composite parent, int flags, int needleArg ) {
+		super( parent, SWT.NONE );
+		this.display = this.getDisplay();
+		this.red = new Color( this.display, 220, 0, 0 );
+		this.gray = new Color( this.display, 160, 160, 160 );
 		
-		// ** override ** do nothing
+		this.graphics = new GC( this );
+		this.tweening = false;
+		
+		this.clear_x = 0;
+		this.clear_y = 0;
+		this.clear_width = CUDAGauge.width;
+		this.clear_height = CUDAGauge.height;
+		
+		this.setNeedle( needleArg );
+		
+		this.addPaintListener( new PaintListener() {
+			CUDAGauge parent;
+			public void paintControl(PaintEvent e) {
+				if ( this.parent == null )
+					this.parent = (CUDAGauge)e.getSource();
+				this.parent.draw();
+			}
+		
+		});
+
+		
 		
 	}
-	
 	
 	private void draw () {
 		

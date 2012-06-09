@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+
 import org.eclipse.swt.widgets.Display;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
 
 public class MainWindow {
+	public static Composite composite;
 	public static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(
 			Display.getDefault());
@@ -102,7 +105,7 @@ public class MainWindow {
 		formToolkit.paintBordersFor(history);
 		new Label(shlSwtApplication, SWT.NONE);
 
-		Composite composite = new Composite(shlSwtApplication, SWT.NONE);
+		composite = new Composite(shlSwtApplication, SWT.NONE);
 		composite.setEnabled(false);
 		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
 		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, false, false,
@@ -113,29 +116,7 @@ public class MainWindow {
 		composite.setBackground(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(composite);
-
-		occupancy = new CUDAGauge(composite, SWT.NONE);
-		occupancy.setGaugeType("occupancy");
-		occupancy.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(occupancy);
-		occupancy.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(occupancy);
-		uncoalesced = new CUDAGauge(composite, SWT.NONE );
-		uncoalesced.setGaugeType( "uncoalesced" );
-		uncoalesced.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(uncoalesced);
-		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(uncoalesced);
 		
-		conflicts = new CUDAGauge(composite, SWT.NONE );
-		conflicts.setGaugeType( "bankconflicts" );
-		conflicts.setLayoutData(new RowData(160, 160));
-		formToolkit.adapt(conflicts);
-		conflicts.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(conflicts);
-
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,
 				"CUDA CODE", SWT.NONE);
 		lblCudaCode.setBackground(SWTResourceManager
@@ -251,10 +232,6 @@ public class MainWindow {
 				} finally {
 
 				}
-				// set gauges to random values
-			//		MainWindow.conflicts.setNeedle((int)Math.random() * 100);
-		//			MainWindow.uncoalesced.setNeedle(25);
-	//				MainWindow.occupancy.moveNeedleTo((int)Math.random() * 100);
 				
 				// play sound
 
@@ -391,5 +368,35 @@ public class MainWindow {
 
 		CUcode.close();		
 		pMap = new ProfileMap("cudaide.log");
+		ChangeGauges();
+	}
+		
+	public static void ChangeGauges()
+	{
+		occupancy = new CUDAGauge(composite, SWT.NONE, (int)(pMap.average("occupancy")*100));
+		occupancy.setGaugeType("occupancy");
+		occupancy.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(occupancy);
+		occupancy.setBackground(SWTResourceManager
+				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(occupancy);
+		
+		
+		uncoalesced = new CUDAGauge(composite, SWT.NONE, (int)(Math.random() * 100) );
+		uncoalesced.setGaugeType( "uncoalesced" );
+		uncoalesced.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(uncoalesced);
+		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(uncoalesced);
+		
+		conflicts = new CUDAGauge(composite, SWT.NONE );
+		conflicts.setGaugeType( "bankconflicts" );
+		conflicts.setLayoutData(new RowData(160, 160));
+		formToolkit.adapt(conflicts);
+		conflicts.setBackground(SWTResourceManager
+				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		formToolkit.paintBordersFor(conflicts);
+
 	}
 }
+	
