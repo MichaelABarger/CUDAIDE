@@ -32,10 +32,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
+import org.swtchart.ILineSeries;
 import org.swtchart.ISeries;
 import org.swtchart.ISeries.SeriesType;
 
 public class MainWindow {
+	
 	public static Composite composite;
 	public static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(
@@ -56,11 +58,8 @@ public class MainWindow {
 	public static ArrowCanvas arrow_canvas;
 	public static ArrayList<Double> execution_times = new ArrayList<Double>();
 	final static File ding = new File( "res" + File.separator + "ding.wav" );
-	/**
-	 * Launch the application.
-	 * 
-	 * @param args
-	 */
+	
+
 	public static void main(String[] args) {
 
 		/**********************************************************************************
@@ -412,7 +411,7 @@ public class MainWindow {
 			// do nothing--no sound is okay, too
 		}
 		
-		MarkChart( Math.random() );
+		MarkChart( Math.random() * 25 );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		
@@ -429,10 +428,13 @@ public class MainWindow {
 		Iterator<Double> iter = MainWindow.execution_times.iterator();
 		for ( int i = 0; i < MainWindow.execution_times.size(); i++ )
 			plot[i] = iter.next();
-		ISeries series = MainWindow.history.getSeriesSet().createSeries( SeriesType.LINE, "history" );
+		if ( MainWindow.history.getSeriesSet().getSeries("history") != null )
+			MainWindow.history.getSeriesSet().deleteSeries( "history" );
+		ILineSeries series = (ILineSeries)MainWindow.history.getSeriesSet().createSeries( SeriesType.LINE, "history" );
 		series.setYSeries( plot );
 		
 		MainWindow.history.getAxisSet().adjustRange();
+		MainWindow.history.redraw();
 		
 	}
 }
