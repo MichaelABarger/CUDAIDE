@@ -53,6 +53,7 @@ public class MainWindow {
 	public static CUDAGauge occupancy;
 	public static CUDAGauge conflicts;
 	public static ProfileMap pMap;
+	public static String [] commandLineArgs;
 	public static ArrowCanvas arrow_canvas;
 	public static ArrayList<Double> execution_times = new ArrayList<Double>();
 	final static File ding = new File( "res" + File.separator + "ding.wav" );
@@ -66,6 +67,7 @@ public class MainWindow {
 		/**********************************************************************************
 		 * BEGIN WINDOW CONTROL DECLARATIONS
 		 */
+		commandLineArgs = args;
 		display = Display.getDefault();
 		Shell shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
 		shlSwtApplication.setDragDetect(false);
@@ -247,7 +249,7 @@ public class MainWindow {
 			            Display.getCurrent().asyncExec(new Runnable() {
 			               public void run() {
 			                  try {
-			                	  MainWindow.compile( new String[] { MainWindow.CUpath.getPath() } );
+			                	  MainWindow.compile( MainWindow.commandLineArgs );
 			                  } catch (Exception e) {
 			                  }
 			               }
@@ -301,7 +303,7 @@ public class MainWindow {
 			shlSwtApplication.layout();
 			arrow_canvas.setDimensions(ppCUDACode.getBounds(), table.getBounds());
 			
-			compile( args );
+			compile( commandLineArgs );
 			
 		} catch (Throwable e) {
 			/*

@@ -22,7 +22,6 @@ const size_t sharedmem_size = (8 + 2) * (8 + 2);
 
 extern __shared__ unsigned char local_current [];
 
-
 __global__ void step	(const unsigned char *current,	// previous 2D field
 						 size_t c_pitch,		// pitch of "current"
 						 unsigned char *next,				// result 2D field
