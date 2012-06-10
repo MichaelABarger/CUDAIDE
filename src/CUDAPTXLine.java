@@ -1,3 +1,4 @@
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -17,7 +18,8 @@ class CUDAPTXLine {
 	String commentedSource;
 	String uncommentedSource;
 	String PTXInstruction[];
-	String Cycles[];
+	Integer Cycles[];
+	Integer Cycle_Sum = 0;
 	String InstructionToken[];
 	String Arg1[];
 	String Arg2[];
@@ -25,7 +27,7 @@ class CUDAPTXLine {
 	int lineNumber;
 	int numPTXInstructions;
 	
-	private static Hashtable inst_cycles = new Hashtable();
+	private static Hashtable<String, Integer> inst_cycles = new Hashtable<String, Integer>();
 
 	static {
 		
@@ -65,7 +67,8 @@ class CUDAPTXLine {
 		inst_cycles.put( "max.d", new Integer(48) );
 		inst_cycles.put( "min.d", new Integer(48) );
 		inst_cycles.put( "mad.d", new Integer(48) );
-		inst_cycles.put( "mul.d", new Integer(48) );
+		inst_cycles.put( "mul.wide.d", new Integer(48) );
+		inst_cycles.put( "mul.lo.d", new Integer(48) );
 		inst_cycles.put( "div.d", new Integer(1366) );
 		inst_cycles.put( "rsqrt.f", new Integer(28) );
 		inst_cycles.put( "sqrt.f", new Integer(56) );
@@ -85,7 +88,7 @@ class CUDAPTXLine {
 
 	void declarePTXInstructionCount(int count) {
 		PTXInstruction = new String[count];
-		Cycles = new String[count];
+		Cycles = new Integer[count];
 		InstructionToken = new String[count];
 		Arg1 = new String[count];
 		Arg2 = new String[count];
@@ -142,7 +145,7 @@ class CUDAPTXLine {
 	public String getArg(int q, int argNum){
 		switch(argNum){
 		case 0:
-			return Cycles[q];
+			return Cycles[q].toString();
 		case 1:
 			return Arg1[q];
 		case 2:
@@ -175,7 +178,18 @@ class CUDAPTXLine {
 					}
 					
 				}
-				// cycle count would go here
+				if ( InstructionToken[i] != null && Cycles[i] != null ) {
+					Enumeration<String> keys = CUDAPTXLine.inst_cycles.keys();
+					while ( keys.hasMoreElements() ) {
+						String this_element = keys.nextElement();
+						if ( InstructionToken[i].contains( this_element ) ) {
+							Cycles[i] = CUDAPTXLine.inst_cycles.get( this_element );
+						}
+					}
+					if ( Cycles[i] == 0 )
+						Cycles[i] = 24;
+					Cycle_Sum += Cycles[i];
+				}
 			}
 		}	
 	}
