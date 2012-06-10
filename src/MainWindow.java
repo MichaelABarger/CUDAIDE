@@ -338,7 +338,7 @@ public class MainWindow {
 
 		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
-		/*
+		
 		Process cur_p = cur_pb.start();
 
 		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
@@ -350,7 +350,7 @@ public class MainWindow {
 				err += err_in;
 			throw new IOException("Compile failed: " + err);
 		}
-		*/
+		
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
@@ -360,7 +360,7 @@ public class MainWindow {
 			throw new IOException(PTXpath.getPath() + " does not exist!");
 		ppPTXScanner = new PTXScanner(); 
 		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-		//PTXpath.deleteOnExit();
+		PTXpath.deleteOnExit();
 		
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
@@ -375,7 +375,7 @@ public class MainWindow {
 		env.put("COMPUTE_PROFILE_LOG", "cudaide.log");
 		env.put("COMPUTE_PROFILE_CONFIG", "config");
 		cur_pb.redirectErrorStream();
-		/*
+		
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
@@ -386,7 +386,7 @@ public class MainWindow {
 		while ((in_in = stdin.readLine()) != null)
 			in += in_in;
 		System.out.println(in);
-		*/
+		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
 		String cudacode_in;
@@ -396,8 +396,8 @@ public class MainWindow {
 		ppCUDACode.resetCaret();
 
 		CUcode.close();		
-		//pMap = new ProfileMap("cudaide.log");
-		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100) );
+		pMap = new ProfileMap("cudaide.log");
+		ChangeGauges( (int)(pMap.average("occupancy") * 100), (int)(pMap.average("gld_incoherent")), (int)(pMap.average("warp_serialize")));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
@@ -417,7 +417,9 @@ public class MainWindow {
 	{
 		occupancy.moveNeedleTo( occupancy_stat );
 		uncoalesced.moveNeedleTo( uncoalesced_stat );
+		System.out.println("Unc: " + uncoalesced_stat);
 		conflicts.moveNeedleTo( conflicts_stat );
+		System.out.println("Con: " + conflicts_stat);
 	}
 	
 	public static void MarkChart( double exec_time ) {
