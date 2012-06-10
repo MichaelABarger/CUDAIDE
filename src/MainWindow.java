@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -55,6 +57,7 @@ public class MainWindow {
 	public static CUDAGauge occupancy;
 	public static CUDAGauge conflicts;
 	public static ProfileMap pMap;
+	public static String [] commandLineArgs;
 	public static ArrowCanvas arrow_canvas;
 	public static ArrayList<Double> execution_times = new ArrayList<Double>();
 	final static File ding = new File( "res" + File.separator + "ding.wav" );
@@ -66,6 +69,7 @@ public class MainWindow {
 		/**********************************************************************************
 		 * BEGIN WINDOW CONTROL DECLARATIONS
 		 */
+		commandLineArgs = args;
 		display = Display.getDefault();
 		shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
 		shlSwtApplication.setDragDetect(false);
@@ -127,7 +131,7 @@ public class MainWindow {
 		uncoalesced.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(uncoalesced);
 		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(uncoalesced);
+		formToolkit.paintBordersFor(uncoalesced);		
 		
 		conflicts = new CUDAGauge(composite, SWT.NONE );
 		conflicts.setGaugeType( "bankconflicts" );
@@ -135,7 +139,6 @@ public class MainWindow {
 		formToolkit.adapt(conflicts);
 		conflicts.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(conflicts);
-		
 		
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,"CUDA CODE", SWT.NONE);
 		lblCudaCode.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -223,11 +226,11 @@ public class MainWindow {
 			public void mouseDown(MouseEvent e) {
 				if ( MainWindow.btnRecompile.isEnabled() ) {
 					try {
-						//MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
+						MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
 			            Display.getCurrent().asyncExec(new Runnable() {
 			               public void run() {
 			                  try {
-			                	  MainWindow.compile( new String[] { MainWindow.CUpath.getPath() } );
+			                	  MainWindow.compile( MainWindow.commandLineArgs );
 			                  } catch (Exception e) {
 			                  }
 			               }
@@ -280,8 +283,8 @@ public class MainWindow {
 			shlSwtApplication.open();
 			shlSwtApplication.layout();
 			arrow_canvas.setDimensions(ppCUDACode.getBounds(), table.getBounds());
-			
-			compile( args );
+
+			compile( commandLineArgs );
 			
 		} catch (Throwable e) {
 			/*
@@ -320,7 +323,7 @@ public class MainWindow {
 
 		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
-		/*
+		
 		Process cur_p = cur_pb.start();
 
 		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
@@ -332,7 +335,7 @@ public class MainWindow {
 				err += err_in;
 			throw new IOException("Compile failed: " + err);
 		}
-		*/
+		
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
@@ -342,12 +345,12 @@ public class MainWindow {
 			throw new IOException(PTXpath.getPath() + " does not exist!");
 		ppPTXScanner = new PTXScanner(); 
 		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-		//PTXpath.deleteOnExit();
+		PTXpath.deleteOnExit();
 		
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
 		command.clear();
-		command.addAll(Arrays.asList("nvcc", "-run"));
+		command.addAll(Arrays.asList("time", "nvcc", "-run"));
 		command.addAll(Arrays.asList(args));
 		// execute NVCC and run the program
 		cur_pb = new ProcessBuilder(command);
@@ -357,18 +360,35 @@ public class MainWindow {
 		env.put("COMPUTE_PROFILE_LOG", "cudaide.log");
 		env.put("COMPUTE_PROFILE_CONFIG", "config");
 		cur_pb.redirectErrorStream();
-		/*
+		
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
-		BufferedReader stderr = new BufferedReader(new InputStreamReader(
-				cur_p.getErrorStream()));
 		String in = "";
 		String in_in;
-		while ((in_in = stdin.readLine()) != null)
+		while ((in_in = stdin.readLine()) != null){
 			in += in_in;
+		}
+
 		System.out.println(in);
-		*/
+
+		command.clear();
+		command.addAll(Arrays.asList("time", "./test/a.out"));
+		command.addAll(Arrays.asList(args));
+		cur_pb = new ProcessBuilder(command);
+
+		cur_pb.redirectErrorStream();
+		
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+				cur_p.getErrorStream()));
+		String err = "";
+		String err_in;
+		double dataPoint = 0.0; 
+		while ((err_in = stderr.readLine()) != null){
+			if(err_in.contains("user"))
+				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
+		}
+		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
 		String cudacode_in;
@@ -378,8 +398,8 @@ public class MainWindow {
 		ppCUDACode.resetCaret();
 
 		CUcode.close();		
-		//pMap = new ProfileMap("cudaide.log");
-		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100) );
+		pMap = new ProfileMap("cudaide.log");
+		ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
@@ -391,8 +411,9 @@ public class MainWindow {
 		} catch ( Exception ex ) {
 			// do nothing--no sound is okay, too
 		}
-		
-		MarkChart( Math.random() * 25 );
+//		System.out.println("" + dataPoint);
+		if(dataPoint != 0)
+			MarkChart( dataPoint );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		

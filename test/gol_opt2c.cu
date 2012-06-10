@@ -17,11 +17,10 @@ size_t next_pitch;
 
 // set the grid/block dimensions for kernel execution
 const dim3 gridDim(16, 16, 1);
-const dim3 blocksDim(8 + 2, 8 + 2, 1); // 256 threads per block
-const size_t sharedmem_size = (8 + 2) * (8 + 2);
+const dim3 blocksDim(8+2, 8+2, 1); // 256 threads per block
+const size_t sharedmem_size = (8+2) * (8+2);
 
 extern __shared__ unsigned char local_current [];
-
 
 __global__ void step	(const unsigned char *current,	// previous 2D field
 						 size_t c_pitch,		// pitch of "current"

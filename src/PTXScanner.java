@@ -7,7 +7,8 @@ public class PTXScanner {
 	public CUDAPTXLine line[];
 	String source[];
 	int sourceLine[];
-	private int scope;
+	private int upperBound;
+	private int lowerBound;
 
 	PTXScanner() {
 	}
@@ -28,17 +29,25 @@ public class PTXScanner {
 	
 	private void setScope()
 	{
-		int b = 0, c = 0;
+		int b = 0, c = 0, d = 0, e;
 		for(int i = 0; i < line.length; i++){
 			if(line[i] != null) b = line[i].getLineNumber();
 			if (b > c) c = b;
 		}
-		scope = c;
+		upperBound = c;
+		e = upperBound;
+		for(int i = 0; i < line.length; i++){
+			if(line[i] != null)	d = line[i].getLineNumber();
+			if (d < e && d != 0) e = d;
+		}
+		lowerBound = e;
 	}
 	
-	public int getScope()
+	public boolean inScope(int a)
 	{
-		return scope;
+		if(a < lowerBound) return false; 
+		else if(a > upperBound) return false;
+		else return true;
 	}
 	
 	public int instructions (int ln)
@@ -74,7 +83,7 @@ public class PTXScanner {
 
 	void ReadInCommentedPTX(String filename) throws FileNotFoundException,
 			IOException {
-		System.out.println("Reading in commented PTX file" + filename);
+//		System.out.println("Reading in commented PTX file" + filename);
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String buffer;
 		String PTXBuffer[] = new String[1000];
