@@ -243,7 +243,7 @@ public class MainWindow {
 			public void mouseDown(MouseEvent e) {
 				if ( MainWindow.btnRecompile.isEnabled() ) {
 					try {
-						//MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
+						MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
 			            Display.getCurrent().asyncExec(new Runnable() {
 			               public void run() {
 			                  try {
