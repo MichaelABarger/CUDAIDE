@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.TableItem;
 					CUDACode.this.arrow_visible = true;
 					ChangeTable(cur_line + 1);
 				} else
-					CUDACode.this.arrow_visible = false;
+					CUDACode.arrow_visible = false;
 		//		else System.out.println(Integer.toString(cur_line) + " is out of CUDA scope (" + Integer.toString(MainWindow.ppPTXScanner.getScope()) + ")");
 			}
 			
@@ -66,11 +66,11 @@ import org.eclipse.swt.widgets.TableItem;
 				int w = 0;
 				w = MainWindow.ppPTXScanner.instructions(n);
 				for(int j = 0; j < w; j++){
-					data = new String[4];
-					TableItem tblInstructions = new TableItem(MainWindow.table, SWT.NONE); 
+					data = new String[5];
+					TableItem tblInstructions = new TableItem(MainWindow.table, SWT.NONE);
 					for(int i = 0; i < 4; i++){
-						data[i] = MainWindow.ppPTXScanner.getArg(n, j, i);
-						if(data[i] == null) data[i] = " ";
+						data[i + 1] = MainWindow.ppPTXScanner.getArg(n, j, i);
+						if(data[i + 1] == null) data[i + 1] = " ";
 					}
 					tblInstructions.setText(data);	
 				}
@@ -91,23 +91,26 @@ import org.eclipse.swt.widgets.TableItem;
 		
 			public void paintControl( PaintEvent e ) {
 				
-				int y1, y2;
-				int caret_pos = MainWindow.ppCUDACode.getCaretOffset();
-				int cur_line = MainWindow.ppCUDACode.getLineAtOffset( caret_pos );
-				int line_pixel = MainWindow.ppCUDACode.getLinePixel( cur_line );
-				Rectangle bounds = MainWindow.ppCUDACode.getBounds();
-				Rectangle client = MainWindow.ppCUDACode.getClientArea();
+				if ( MainWindow.ppCUDACode != null && MainWindow.arrow_canvas != null ) {
 				
-				if ( line_pixel < 0 )
-					y1 = y2 = 0;
-				else if ( line_pixel > bounds.height ) {
-					y1 = client.height;
-					y2 = bounds.height;
-				} else {
-					y1 = line_pixel + 1;
-					y2 = y1 + MainWindow.ppCUDACode.getLineHeight( cur_line );
+					int y1, y2;
+					int caret_pos = MainWindow.ppCUDACode.getCaretOffset();
+					int cur_line = MainWindow.ppCUDACode.getLineAtOffset( caret_pos );
+					int line_pixel = MainWindow.ppCUDACode.getLinePixel( cur_line );
+					Rectangle bounds = MainWindow.ppCUDACode.getBounds();
+					Rectangle client = MainWindow.ppCUDACode.getClientArea();
+					
+					if ( line_pixel < 0 )
+						y1 = y2 = 0;
+					else if ( line_pixel > bounds.height ) {
+						y1 = client.height;
+						y2 = bounds.height;
+					} else {
+						y1 = line_pixel + 1;
+						y2 = y1 + MainWindow.ppCUDACode.getLineHeight( cur_line );
+					}
+					MainWindow.arrow_canvas.drawArrow( y1, y2 );
 				}
-				MainWindow.arrow_canvas.drawArrow( y1, y2 );
 			}
 			
 			public void finalize () throws Throwable {

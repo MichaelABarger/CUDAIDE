@@ -38,10 +38,10 @@ import org.swtchart.ISeries.SeriesType;
 
 public class MainWindow {
 	
+	public static Shell shlSwtApplication;
 	public static Composite composite;
 	public static Table table;
-	private static final FormToolkit formToolkit = new FormToolkit(
-			Display.getDefault());
+	private static final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	public static Chart history;
 	public static Button btnRecompile;
 	public static CUDACode ppCUDACode;
@@ -59,6 +59,7 @@ public class MainWindow {
 	public static ArrowCanvas arrow_canvas;
 	public static ArrayList<Double> execution_times = new ArrayList<Double>();
 	final static File ding = new File( "res" + File.separator + "ding.wav" );
+	private static TableColumn tblclmnCycles;
 	
 
 	public static void main(String[] args) {
@@ -68,34 +69,26 @@ public class MainWindow {
 		 */
 		commandLineArgs = args;
 		display = Display.getDefault();
-		Shell shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
+		shlSwtApplication = new Shell(SWT.DIALOG_TRIM);
 		shlSwtApplication.setDragDetect(false);
-		shlSwtApplication.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		shlSwtApplication.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		shlSwtApplication.setSize(1094, 504);
 		shlSwtApplication.setText("CUDA IDE");
 		shlSwtApplication.setLayout(new GridLayout(3, false));
 
-		Label lblHistory = formToolkit.createLabel(shlSwtApplication,
-				"PERFORMANCE HISTORY", SWT.NONE);
-		lblHistory.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		GridData gd_lblHistory = new GridData(SWT.LEFT, SWT.BOTTOM, false,
-				false, 1, 1);
+		Label lblHistory = formToolkit.createLabel(shlSwtApplication,"PERFORMANCE HISTORY", SWT.NONE);
+		lblHistory.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		GridData gd_lblHistory = new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1);
 		gd_lblHistory.heightHint = 12;
 		lblHistory.setLayoutData(gd_lblHistory);
-		lblHistory.setFont(SWTResourceManager
-				.getFont("Segoe UI", 7, SWT.NORMAL));
+		lblHistory.setFont(SWTResourceManager.getFont("Segoe UI", 7, SWT.NORMAL));
 		new Label(shlSwtApplication, SWT.NONE);
 
 		Label lblEfficiencyMetrics = new Label(shlSwtApplication, SWT.NONE);
-		lblEfficiencyMetrics.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM,
-				false, false, 1, 1));
+		lblEfficiencyMetrics.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
 		formToolkit.adapt(lblEfficiencyMetrics, true, true);
-		lblEfficiencyMetrics.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		lblEfficiencyMetrics.setFont(SWTResourceManager.getFont("Segoe UI", 7,
-				SWT.NORMAL));
+		lblEfficiencyMetrics.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		lblEfficiencyMetrics.setFont(SWTResourceManager.getFont("Segoe UI", 7, SWT.NORMAL));
 		lblEfficiencyMetrics.setText("EFFICIENCY METRICS");
 
 		history = new Chart(shlSwtApplication, SWT.BORDER);
@@ -105,10 +98,9 @@ public class MainWindow {
 		history.getAxisSet().getXAxis(0).getTitle().setText("");
 		history.getAxisSet().getYAxis(0).getTitle().setText("");
 		history.getLegend().setVisible( false );
-		GridData gd_history = new GridData(SWT.FILL, SWT.CENTER, false, false,
-				1, 1);
+		GridData gd_history = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_history.heightHint = 160;
-		gd_history.widthHint = 518;
+		gd_history.widthHint = 534;
 		history.setLayoutData(gd_history);
 		formToolkit.adapt(history);
 		formToolkit.paintBordersFor(history);
@@ -117,13 +109,11 @@ public class MainWindow {
 		composite = new Composite(shlSwtApplication, SWT.NONE);
 		composite.setEnabled(false);
 		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
-		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, false, false,
-				1, 1);
+		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
 		gd_composite.widthHint = 489;
 		composite.setLayoutData(gd_composite);
 		formToolkit.adapt(composite);
-		composite.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		composite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(composite);
 		
 		
@@ -131,8 +121,7 @@ public class MainWindow {
 		occupancy.setGaugeType("occupancy");
 		occupancy.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(occupancy);
-		occupancy.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		occupancy.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(occupancy);	
 		
 		uncoalesced = new CUDAGauge( composite, SWT.NONE );
@@ -146,51 +135,41 @@ public class MainWindow {
 		conflicts.setGaugeType( "bankconflicts" );
 		conflicts.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(conflicts);
-		conflicts.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		conflicts.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(conflicts);
 		
 		
-		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,
-				"CUDA CODE", SWT.NONE);
-		lblCudaCode.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		GridData gd_lblCudaCode = new GridData(SWT.LEFT, SWT.BOTTOM, false,
-				false, 1, 1);
+		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,"CUDA CODE", SWT.NONE);
+		lblCudaCode.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		GridData gd_lblCudaCode = new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1);
 		gd_lblCudaCode.heightHint = 13;
 		lblCudaCode.setLayoutData(gd_lblCudaCode);
-		lblCudaCode.setFont(SWTResourceManager.getFont("Segoe UI", 7,
-				SWT.NORMAL));
+		lblCudaCode.setFont(SWTResourceManager.getFont("Segoe UI", 7,SWT.NORMAL));
 		new Label(shlSwtApplication, SWT.NONE);
 
-		Label lblPtxAssemblerBreakdown = formToolkit.createLabel(
-				shlSwtApplication, "PTX ASSEMBLER BREAKDOWN", SWT.NONE);
-		lblPtxAssemblerBreakdown.setBackground(SWTResourceManager
-				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		GridData gd_lblPtxAssemblerBreakdown = new GridData(SWT.LEFT,
-				SWT.BOTTOM, false, false, 1, 1);
+		Label lblPtxAssemblerBreakdown = formToolkit.createLabel(shlSwtApplication, "PTX ASSEMBLER BREAKDOWN", SWT.NONE);
+		lblPtxAssemblerBreakdown.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		GridData gd_lblPtxAssemblerBreakdown = new GridData(SWT.LEFT,SWT.BOTTOM, false, false, 1, 1);
 		gd_lblPtxAssemblerBreakdown.heightHint = 12;
 		lblPtxAssemblerBreakdown.setLayoutData(gd_lblPtxAssemblerBreakdown);
-		lblPtxAssemblerBreakdown.setFont(SWTResourceManager.getFont("Segoe UI",
-				7, SWT.NORMAL));
+		lblPtxAssemblerBreakdown.setFont(SWTResourceManager.getFont("Segoe UI",7, SWT.NORMAL));
 
-		ppCUDACode = new CUDACode(shlSwtApplication, SWT.BORDER | SWT.MULTI
-				| SWT.V_SCROLL | SWT.H_SCROLL);
+		ppCUDACode = new CUDACode(shlSwtApplication, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+		ppCUDACode.setMarginColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+		ppCUDACode.setLeftMargin(50);
 		ppCUDACode.setTabs(3);
 		ppCUDACode.setDoubleClickEnabled(false);
 		ppCUDACode.setDragDetect(false);
 		ppCUDACode.setWordWrap(false);
-		GridData gd_ppCUDACode = new GridData(SWT.FILL, SWT.FILL, false, false,
-				1, 1);
+		GridData gd_ppCUDACode = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
 		gd_ppCUDACode.heightHint = 197;
-		gd_ppCUDACode.widthHint = 514;
+		gd_ppCUDACode.widthHint = 324;
 		ppCUDACode.setLayoutData(gd_ppCUDACode);
 
 		// add custom event listeners
 		
 		arrow_canvas = new ArrowCanvas(shlSwtApplication, SWT.NONE);
-		GridData gd_arrow_canvas = new GridData(SWT.FILL, SWT.FILL, true, false, 1,
-				1);
+		GridData gd_arrow_canvas = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd_arrow_canvas.widthHint = 46;
 		gd_arrow_canvas.heightHint = 208;
 		arrow_canvas.setLayoutData(gd_arrow_canvas);
@@ -206,34 +185,36 @@ public class MainWindow {
 		table.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+		
+		tblclmnCycles = new TableColumn(table, SWT.NONE);
+		tblclmnCycles.setWidth(49);
+		tblclmnCycles.setText("Cycles");
 
 		TableColumn tblclmnInstruction = new TableColumn(table, SWT.NONE);
 		tblclmnInstruction.setResizable(false);
-		tblclmnInstruction.setWidth(157);
+		tblclmnInstruction.setWidth(136);
 		tblclmnInstruction.setText("Instruction");
 		
 		TableColumn tblclmnArgument = new TableColumn(table, SWT.NONE);
 		tblclmnArgument.setResizable(false);
-		tblclmnArgument.setWidth(110);
+		tblclmnArgument.setWidth(100);
 		tblclmnArgument.setText("Argument 1");
 
 		TableColumn tblclmnArgument_1 = new TableColumn(table, SWT.NONE);
 		tblclmnArgument_1.setResizable(false);
-		tblclmnArgument_1.setWidth(110);
+		tblclmnArgument_1.setWidth(100);
 		tblclmnArgument_1.setText("Argument 2");
 
 		TableColumn tblclmnArgument_2 = new TableColumn(table, SWT.LEFT);
 		tblclmnArgument_2.setResizable(false);
-		tblclmnArgument_2.setWidth(108);
+		tblclmnArgument_2.setWidth(100);
 		tblclmnArgument_2.setText("Argument 3");
 		new Label(shlSwtApplication, SWT.NONE);
 		new Label(shlSwtApplication, SWT.NONE);
 		btnRecompile = new Button(shlSwtApplication, SWT.NONE);
 		btnRecompile.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-		btnRecompile.setFont(SWTResourceManager
-				.getFont("Segoe UI", 9, SWT.BOLD));
-		GridData gd_btnRecompile = new GridData(SWT.RIGHT, SWT.CENTER, false,
-				false, 1, 1);
+		btnRecompile.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		GridData gd_btnRecompile = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
 		gd_btnRecompile.heightHint = 27;
 		btnRecompile.setLayoutData(gd_btnRecompile);
 		formToolkit.adapt(btnRecompile, true, true);
@@ -451,6 +432,9 @@ public class MainWindow {
 		if ( MainWindow.history.getSeriesSet().getSeries("history") != null )
 			MainWindow.history.getSeriesSet().deleteSeries( "history" );
 		ILineSeries series = (ILineSeries)MainWindow.history.getSeriesSet().createSeries( SeriesType.LINE, "history" );
+		series.setLineWidth( 3 );
+		series.setSymbolSize( 5 );
+		series.setAntialias( SWT.ON );
 		series.setYSeries( plot );
 		
 		MainWindow.history.getAxisSet().adjustRange();
