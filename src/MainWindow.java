@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -140,7 +142,7 @@ public class MainWindow {
 		uncoalesced.setLayoutData(new RowData(160, 160));
 		formToolkit.adapt(uncoalesced);
 		uncoalesced.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		formToolkit.paintBordersFor(uncoalesced);
+		formToolkit.paintBordersFor(uncoalesced);		
 		
 		conflicts = new CUDAGauge(composite, SWT.NONE );
 		conflicts.setGaugeType( "bankconflicts" );
@@ -149,7 +151,6 @@ public class MainWindow {
 		conflicts.setBackground(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		formToolkit.paintBordersFor(conflicts);
-		
 		
 		Label lblCudaCode = formToolkit.createLabel(shlSwtApplication,
 				"CUDA CODE", SWT.NONE);
@@ -301,7 +302,7 @@ public class MainWindow {
 			shlSwtApplication.open();
 			shlSwtApplication.layout();
 			arrow_canvas.setDimensions(ppCUDACode.getBounds(), table.getBounds());
-			
+
 			compile( commandLineArgs );
 			
 		} catch (Throwable e) {
