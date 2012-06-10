@@ -1,3 +1,6 @@
+import java.util.Hashtable;
+import java.util.Map;
+
 /*Scanner for Compiled PTX with commented source
  *For group 4B: Visual Profiling of CUDA Code:
  *
@@ -14,13 +17,62 @@ class CUDAPTXLine {
 	String commentedSource;
 	String uncommentedSource;
 	String PTXInstruction[];
+	String Cycles[];
 	String InstructionToken[];
 	String Arg1[];
 	String Arg2[];
 	String Arg3[];
 	int lineNumber;
 	int numPTXInstructions;
+	
+	private static Hashtable inst_cycles = new Hashtable();
 
+	static {
+		
+		inst_cycles.put( "add.u", new Integer(24) );
+		inst_cycles.put( "sub.u", new Integer(24) );
+		inst_cycles.put( "max.u", new Integer(24) );
+		inst_cycles.put( "min.u", new Integer(24) );
+		inst_cycles.put( "add.s", new Integer(24) );
+		inst_cycles.put( "sub.s", new Integer(24) );
+		inst_cycles.put( "max.s", new Integer(24) );
+		inst_cycles.put( "min.s", new Integer(24) );
+		inst_cycles.put( "mad.u", new Integer(120) );
+		inst_cycles.put( "mad.s", new Integer(120) );
+		inst_cycles.put( "mul.wide.u", new Integer(96) );
+		inst_cycles.put( "mul.wide.s", new Integer(96) );
+		inst_cycles.put( "mul.lo.u", new Integer(96) );
+		inst_cycles.put( "mul.lo.s", new Integer(96) );
+		inst_cycles.put( "div.u", new Integer(608) );
+		inst_cycles.put( "div.s", new Integer(684) );
+		inst_cycles.put( "rem.u", new Integer(728) );
+		inst_cycles.put( "rem.s", new Integer(784) );
+		inst_cycles.put( "and.u", new Integer(24) );
+		inst_cycles.put( "or.u", new Integer(24) );
+		inst_cycles.put( "xor.u", new Integer(24) );
+		inst_cycles.put( "shl.u", new Integer(24) );
+		inst_cycles.put( "shr.u", new Integer(24) );
+		inst_cycles.put( "add.f", new Integer(24) );
+		inst_cycles.put( "sub.f", new Integer(24) );
+		inst_cycles.put( "max.f", new Integer(24) );
+		inst_cycles.put( "min.f", new Integer(24) );
+		inst_cycles.put( "mad.f", new Integer(24) );
+		inst_cycles.put( "mul.wide.f", new Integer(24) );
+		inst_cycles.put( "mul.lo.f", new Integer(24) );
+		inst_cycles.put( "div.f", new Integer(137) );
+		inst_cycles.put( "add.d", new Integer(48) );
+		inst_cycles.put( "sub.d", new Integer(48) );
+		inst_cycles.put( "max.d", new Integer(48) );
+		inst_cycles.put( "min.d", new Integer(48) );
+		inst_cycles.put( "mad.d", new Integer(48) );
+		inst_cycles.put( "mul.d", new Integer(48) );
+		inst_cycles.put( "div.d", new Integer(1366) );
+		inst_cycles.put( "rsqrt.f", new Integer(28) );
+		inst_cycles.put( "sqrt.f", new Integer(56) );
+		inst_cycles.put( "ld.global", new Integer(443) );
+	}
+	
+	
 	CUDAPTXLine() {
 		numPTXInstructions = 0;
 		commentedSource = null;
@@ -33,6 +85,7 @@ class CUDAPTXLine {
 
 	void declarePTXInstructionCount(int count) {
 		PTXInstruction = new String[count];
+		Cycles = new String[count];
 		InstructionToken = new String[count];
 		Arg1 = new String[count];
 		Arg2 = new String[count];
@@ -88,6 +141,8 @@ class CUDAPTXLine {
 	
 	public String getArg(int q, int argNum){
 		switch(argNum){
+		case 0:
+			return Cycles[q];
 		case 1:
 			return Arg1[q];
 		case 2:
@@ -117,8 +172,10 @@ class CUDAPTXLine {
 						else if(Arg1[i] == null) Arg1[i] = Token[j];
 						else if(Arg2[i] == null) Arg2[i] = Token[j];
 						else if(Arg3[i] == null) Arg3[i] = Token[j];
-					} 
+					}
+					
 				}
+				// cycle count would go here
 			}
 		}	
 	}
