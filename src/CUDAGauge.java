@@ -45,8 +45,6 @@ public class CUDAGauge extends Canvas {
 		this.graphics = new GC( this );
 		this.tweening = false;
 		
-		resetClears();
-		
 		this.setNeedle( 50 );
 		
 		this.addPaintListener( new PaintListener() {
