@@ -83,7 +83,7 @@ public class PTXScanner {
 
 	void ReadInCommentedPTX(String filename) throws FileNotFoundException,
 			IOException {
-		System.out.println("Reading in commented PTX file" + filename);
+//		System.out.println("Reading in commented PTX file" + filename);
 		BufferedReader in = new BufferedReader(new FileReader(filename));
 		String buffer;
 		String PTXBuffer[] = new String[1000];

@@ -65,7 +65,7 @@ public class CUDAGauge extends Canvas {
 	
 	private void draw () {
 		
-		resetClears();
+//		resetClears();
 		if ( this.gauge_img != null ) {
 			Point needle[] = new Point[] { new Point( 0, -CUDAGauge.needle_length ), new Point( -5, 0 ), new Point( 0, 10 ), new Point( 5, 0 ) };
 			double transform[][] = new double[][] { { Math.cos(angle), -Math.sin(angle) }, { Math.sin(angle), Math.cos(angle) } };

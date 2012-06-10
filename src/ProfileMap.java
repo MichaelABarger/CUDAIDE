@@ -90,7 +90,7 @@ public class ProfileMap {
 			
 			//FileReader in_file = new FileReader( System.getProperty("user.dir") + System.getProperty("file.separator") + filename);
 			
-			System.out.println( "filename : "  + i_file.getAbsolutePath() );
+//			System.out.println( "filename : "  + i_file.getAbsolutePath() );
 			
 			FileReader in_file = new FileReader( i_file );
 			
@@ -124,7 +124,7 @@ public class ProfileMap {
 		try {
 			while( (str = in_f_read.readLine()) != null ){
 
-				System.out.println( "str: " + str );
+//				System.out.println( "str: " + str );
 
 				if( str.startsWith( sch ) ){
 
@@ -170,7 +170,7 @@ public class ProfileMap {
 			}
 			else{
 				
-				System.out.println( "optionsString :" + str_options );
+//				System.out.println( "optionsString :" + str_options );
 				
 				/** make a new sub-HashMap for each option */
 				this.profileMap.put( str_options.substring( 0, option_len ), 
