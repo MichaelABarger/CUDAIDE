@@ -382,22 +382,30 @@ public class MainWindow {
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
-		BufferedReader stderr = new BufferedReader(new InputStreamReader(
-				cur_p.getErrorStream()));
 		String in = "";
 		String in_in;
-		String err = "";
-		String err_in;
 		while ((in_in = stdin.readLine()) != null){
 			in += in_in;
 		}
+
+		System.out.println(in);
+
+		command.clear();
+		command.addAll(Arrays.asList("time", "./test/a.out"));
+		command.addAll(Arrays.asList(args));
+		cur_pb = new ProcessBuilder(command);
+
+		cur_pb.redirectErrorStream();
+		
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+				cur_p.getErrorStream()));
+		String err = "";
+		String err_in;
 		double dataPoint = 0.0; 
 		while ((err_in = stderr.readLine()) != null){
 			if(err_in.contains("user"))
 				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
 		}
-		System.out.println(in);
-		System.out.println(err);
 		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
@@ -421,6 +429,7 @@ public class MainWindow {
 		} catch ( Exception ex ) {
 			// do nothing--no sound is okay, too
 		}
+//		System.out.println("" + dataPoint);
 		if(dataPoint != 0)
 			MarkChart( dataPoint );
 		MainWindow.btnRecompile.setEnabled( true );
