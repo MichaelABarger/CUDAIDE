@@ -397,7 +397,7 @@ public class MainWindow {
 
 		CUcode.close();		
 		pMap = new ProfileMap("cudaide.log");
-		ChangeGauges( (int)(pMap.average("occupancy") * 100), (int)(pMap.average("gld_incoherent")), (int)(pMap.average("warp_serialize")));
+		ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)(pMap.average("warp_serialize") * 100));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
