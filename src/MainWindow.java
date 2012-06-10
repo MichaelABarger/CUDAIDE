@@ -378,6 +378,7 @@ public class MainWindow {
 		cur_pb = new ProcessBuilder(command);
 
 		cur_pb.redirectErrorStream();
+		cur_p = cur_pb.start();
 		
 		BufferedReader stderr = new BufferedReader(new InputStreamReader(
 				cur_p.getErrorStream()));
