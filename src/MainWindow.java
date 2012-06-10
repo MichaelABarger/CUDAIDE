@@ -420,9 +420,7 @@ public class MainWindow {
 	{
 		occupancy.moveNeedleTo( occupancy_stat );
 		uncoalesced.moveNeedleTo( uncoalesced_stat );
-		System.out.println("Unc: " + uncoalesced_stat);
 		conflicts.moveNeedleTo( conflicts_stat );
-		System.out.println("Con: " + conflicts_stat);
 	}
 	
 	public static void MarkChart( double exec_time ) {
