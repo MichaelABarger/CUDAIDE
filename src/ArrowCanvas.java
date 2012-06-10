@@ -9,11 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ArrowCanvas extends Canvas {
 
-	Color orange;
-	Color background;
-	GC gc;
-	int cur_y1, cur_y2;
-	Rectangle leftside, rightside;
+	private Color orange;
+	private Color background;
+	private GC gc;
+	private int cur_y1, cur_y2;
+	private Rectangle leftside, rightside;
+	private boolean needs_clear = true;
 	
 	// constructor
 	public ArrowCanvas( Composite parent, int style ) {
@@ -44,20 +45,28 @@ public class ArrowCanvas extends Canvas {
 		
 		if ( this.cur_y1 != y1 && this.cur_y2 != y2 ) {
 			
-			if ( this.cur_y1 != -1 && this.cur_y2 != -1 ) {
+			if ( this.cur_y1 != -1 && this.cur_y2 != -1 && needs_clear ) {
+				
 				this.gc.setAntialias( SWT.ON );
 				this.gc.setBackground( background );
 				this.gc.fillPolygon( new int[] { x1, this.cur_y2 + 1, x1, this.cur_y1 - 1, rightside.x, rightside.y - 1, rightside.x, rightside.y + rightside.height + 1 } );
 				this.gc.setAntialias( SWT.OFF );
+				
+				needs_clear = false;
 			}
 		
-			this.gc.setAntialias( SWT.ON );
-			this.gc.setBackground( orange );
-			this.gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
-			this.gc.setAntialias( SWT.OFF );
-			
-			this.cur_y1 = y1;
-			this.cur_y2 = y2;
+			if ( CUDACode.arrow_visible ) {
+				
+				this.gc.setAntialias( SWT.ON );
+				this.gc.setBackground( orange );
+				this.gc.fillPolygon( new int[] { x1, y2, x1, y1, rightside.x, rightside.y, rightside.x, rightside.y + rightside.height } );
+				this.gc.setAntialias( SWT.OFF );
+				
+				this.cur_y1 = y1;
+				this.cur_y2 = y2;
+				
+				needs_clear = true;
+			}
 		}
 		
 	}

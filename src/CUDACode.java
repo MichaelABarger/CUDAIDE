@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 	public final class CUDACode extends StyledText {
 
-		ArrowCanvas c;
+		public static boolean arrow_visible = false;
 	
 		public CUDACode(Composite parent, int style) {
 			super(parent, style);
@@ -21,43 +21,33 @@ import org.eclipse.swt.widgets.TableItem;
 			addPaintListener(new CUDAPaintListener());
 		}
 		
-		public void setCanvas( ArrowCanvas c ) {
-			this.c = c;
-		}
-		
 		public void resetCaret() {
 			this.setCaretOffset( 100 );
 			this.setCaretOffset( 0 );
 		}
 		
-		public ArrowCanvas getCanvas() {
-			return this.c;
-		}
-
 		public class CUDACaretListener implements CaretListener {
 			int prev_line = 0;
-			Display display;
-			CUDACode parent;
 			Color orange;
-			
+
 			public void caretMoved ( CaretEvent e ) {
-				if ( this.parent == null )
-					this.parent = (CUDACode)e.getSource();
-				if ( this.display == null )
-					this.display = this.parent.getDisplay();
-				if ( this.orange == null )
-					this.orange = new Color ( this.display, 255, 127, 0 );
 				
-				int cur_line = parent.getLineAtOffset( e.caretOffset );
+				int cur_line = MainWindow.ppCUDACode.getLineAtOffset( e.caretOffset );
+				
+				if ( orange == null )
+					orange = new Color ( MainWindow.ppCUDACode.getDisplay(), 255, 127, 0 );
 				
 				if ( cur_line != prev_line ) {
-					parent.setLineBackground( prev_line, 1, null );
-					parent.setLineBackground( cur_line, 1, this.orange );
+					MainWindow.ppCUDACode.setLineBackground( prev_line, 1, null );
+					MainWindow.ppCUDACode.setLineBackground( cur_line, 1, this.orange );
 					prev_line = cur_line;
 				}
 				MainWindow.table.removeAll();
-				if(cur_line < MainWindow.ppPTXScanner.getScope())
+				if(cur_line < MainWindow.ppPTXScanner.getScope()) {
+					CUDACode.this.arrow_visible = true;
 					ChangeTable(cur_line + 1);
+				} else
+					CUDACode.this.arrow_visible = false;
 		//		else System.out.println(Integer.toString(cur_line) + " is out of CUDA scope (" + Integer.toString(MainWindow.ppPTXScanner.getScope()) + ")");
 			}
 			
@@ -98,29 +88,15 @@ import org.eclipse.swt.widgets.TableItem;
 		}
 		
 		public class CUDAPaintListener implements PaintListener {
-			Display display;
-			CUDACode parent;
-			ArrowCanvas canvas;
-			Rectangle bounds;
-			Rectangle client;
-			
+		
 			public void paintControl( PaintEvent e ) {
-				int y1, y2;
 				
-				if ( this.parent == null )
-					this.parent = (CUDACode)e.getSource();
-				if ( this.display == null )
-					this.display = this.parent.getDisplay();
-				if ( this.canvas == null )
-					this.canvas = this.parent.getCanvas();
-				if ( this.bounds == null ) {
-					this.client = parent.getClientArea();
-					this.bounds = parent.getBounds();
-				}
-
-				int caret_pos = parent.getCaretOffset();
-				int cur_line = parent.getLineAtOffset( caret_pos );
-				int line_pixel = parent.getLinePixel( cur_line );
+				int y1, y2;
+				int caret_pos = MainWindow.ppCUDACode.getCaretOffset();
+				int cur_line = MainWindow.ppCUDACode.getLineAtOffset( caret_pos );
+				int line_pixel = MainWindow.ppCUDACode.getLinePixel( cur_line );
+				Rectangle bounds = MainWindow.ppCUDACode.getBounds();
+				Rectangle client = MainWindow.ppCUDACode.getClientArea();
 				
 				if ( line_pixel < 0 )
 					y1 = y2 = 0;
@@ -129,9 +105,9 @@ import org.eclipse.swt.widgets.TableItem;
 					y2 = bounds.height;
 				} else {
 					y1 = line_pixel + 1;
-					y2 = y1 + parent.getLineHeight( cur_line );
+					y2 = y1 + MainWindow.ppCUDACode.getLineHeight( cur_line );
 				}
-				this.canvas.drawArrow( y1, y2 );
+				MainWindow.arrow_canvas.drawArrow( y1, y2 );
 			}
 			
 			public void finalize () throws Throwable {

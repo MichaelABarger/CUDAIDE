@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.ListIterator;
 
 import org.eclipse.swt.widgets.Display;
 import java.util.Map;
@@ -30,14 +32,16 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.swtchart.Chart;
+import org.swtchart.ISeries;
+import org.swtchart.ISeries.SeriesType;
 
 public class MainWindow {
 	public static Composite composite;
 	public static Table table;
 	private static final FormToolkit formToolkit = new FormToolkit(
 			Display.getDefault());
-	private static Chart history;
-	private static Button btnRecompile;
+	public static Chart history;
+	public static Button btnRecompile;
 	public static CUDACode ppCUDACode;
 	public static PTXScanner ppPTXScanner;
 	public static int currentLine;
@@ -49,6 +53,9 @@ public class MainWindow {
 	public static CUDAGauge occupancy;
 	public static CUDAGauge conflicts;
 	public static ProfileMap pMap;
+	public static ArrowCanvas arrow_canvas;
+	public static ArrayList<Double> execution_times = new ArrayList<Double>();
+	final static File ding = new File( "res" + File.separator + "ding.wav" );
 	/**
 	 * Launch the application.
 	 * 
@@ -96,6 +103,7 @@ public class MainWindow {
 		history.getAxisSet().getYAxis(0).getTick().setVisible(false);
 		history.getAxisSet().getXAxis(0).getTitle().setText("");
 		history.getAxisSet().getYAxis(0).getTitle().setText("");
+		history.getLegend().setVisible( false );
 		GridData gd_history = new GridData(SWT.FILL, SWT.CENTER, false, false,
 				1, 1);
 		gd_history.heightHint = 160;
@@ -179,23 +187,22 @@ public class MainWindow {
 
 		// add custom event listeners
 		
-		ArrowCanvas canvas_1 = new ArrowCanvas(shlSwtApplication, SWT.NONE);
-		GridData gd_canvas_1 = new GridData(SWT.FILL, SWT.FILL, true, false, 1,
+		arrow_canvas = new ArrowCanvas(shlSwtApplication, SWT.NONE);
+		GridData gd_arrow_canvas = new GridData(SWT.FILL, SWT.FILL, true, false, 1,
 				1);
-		gd_canvas_1.widthHint = 46;
-		gd_canvas_1.heightHint = 208;
-		canvas_1.setLayoutData(gd_canvas_1);
-		canvas_1.setVisible(false);
-		formToolkit.adapt(canvas_1);
-		formToolkit.paintBordersFor(canvas_1);
-		ppCUDACode.setCanvas(canvas_1);
+		gd_arrow_canvas.widthHint = 46;
+		gd_arrow_canvas.heightHint = 208;
+		arrow_canvas.setLayoutData(gd_arrow_canvas);
+		arrow_canvas.setVisible(false);
+		formToolkit.adapt(arrow_canvas);
+		formToolkit.paintBordersFor(arrow_canvas);
 		
 		table = new Table(shlSwtApplication, SWT.BORDER | SWT.FULL_SELECTION);
 		GridData gd_table = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
 		gd_table.heightHint = 166;
 		gd_table.widthHint = 375;
 		table.setLayoutData(gd_table);
-		table.setFont(SWTResourceManager.getFont("Segoe UI", 7, SWT.NORMAL));
+		table.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
@@ -233,17 +240,18 @@ public class MainWindow {
 		
 		btnRecompile.addMouseListener(new MouseAdapter() {
 			
-			final File audio_file = new File( "res" + File.separator + "ding.wav" );
+			
 			
 			public void mouseDown(MouseEvent e) {
+				
+				MainWindow.btnRecompile.setEnabled( false );
+				
 				String [] compileArgs = new String[1];
 				compileArgs[0] = MainWindow.CUpath.getPath();
 				try {
-					MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
-					MainWindow.compile(compileArgs);
-					occupancy.moveNeedleTo( (int)( Math.random() * 100 ) );
-					uncoalesced.moveNeedleTo( (int)( Math.random() * 100 ) );
-					conflicts.moveNeedleTo( (int)( Math.random() * 100 ) );
+					//MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
+					MainWindow.compile( compileArgs );
+					MainWindow.btnRecompile.setEnabled( true );
 					
 				} catch (Exception x) {
 					/*
@@ -260,19 +268,6 @@ public class MainWindow {
 					System.exit(1);
 				} finally {
 
-				}
-				
-				// play sound
-
-				try {
-					AudioInputStream au = AudioSystem.getAudioInputStream( audio_file );
-					Clip clip = AudioSystem.getClip();
-					
-					clip.open( au );
-					clip.start();
-					
-				} catch ( Exception ex ) {
-					// do nothing--no sound is okay, too
 				}
 			}
 			
@@ -299,13 +294,14 @@ public class MainWindow {
 			CUpath = new File(args[0]);
 			if (!CUpath.exists())
 				throw new IOException(CUpath.getPath() + " does not exist!");
-			CUfilename = CUpath.getName();
-
-			compile(args);	
+			CUfilename = CUpath.getName();	
 			
 			shlSwtApplication.open();
 			shlSwtApplication.layout();
-			canvas_1.setDimensions(ppCUDACode.getBounds(), table.getBounds());
+			arrow_canvas.setDimensions(ppCUDACode.getBounds(), table.getBounds());
+			
+			compile( args );
+			
 		} catch (Throwable e) {
 			/*
 			 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
@@ -330,7 +326,7 @@ public class MainWindow {
 		}
 	}
 
-	public static void compile(String [] args) throws IOException, InterruptedException
+	public static void compile( String [] args ) throws IOException, InterruptedException
 	{
 		/*************** compile CU into commented PTX *****************/
 		// build command line and execute
@@ -342,6 +338,7 @@ public class MainWindow {
 
 		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
+		/*
 		Process cur_p = cur_pb.start();
 
 		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
@@ -353,6 +350,7 @@ public class MainWindow {
 				err += err_in;
 			throw new IOException("Compile failed: " + err);
 		}
+		*/
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
@@ -362,7 +360,7 @@ public class MainWindow {
 			throw new IOException(PTXpath.getPath() + " does not exist!");
 		ppPTXScanner = new PTXScanner(); 
 		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-		PTXpath.deleteOnExit();
+		//PTXpath.deleteOnExit();
 		
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
@@ -377,6 +375,7 @@ public class MainWindow {
 		env.put("COMPUTE_PROFILE_LOG", "cudaide.log");
 		env.put("COMPUTE_PROFILE_CONFIG", "config");
 		cur_pb.redirectErrorStream();
+		/*
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
@@ -387,6 +386,7 @@ public class MainWindow {
 		while ((in_in = stdin.readLine()) != null)
 			in += in_in;
 		System.out.println(in);
+		*/
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
 		String cudacode_in;
@@ -396,15 +396,41 @@ public class MainWindow {
 		ppCUDACode.resetCaret();
 
 		CUcode.close();		
-		pMap = new ProfileMap("cudaide.log");
-		ChangeGauges( 0, 0, 0 );
+		//pMap = new ProfileMap("cudaide.log");
+		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100) );
+		// play sound
+		try {
+			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
+			Clip clip = AudioSystem.getClip();
+			
+			clip.open( au );
+			clip.start();
+			
+		} catch ( Exception ex ) {
+			// do nothing--no sound is okay, too
+		}
+		
+		MarkChart( (int)(Math.random() * 100) );
 	}
 		
 	public static void ChangeGauges( int occupancy_stat, int uncoalesced_stat, int conflicts_stat ) // each 0~100
 	{
 		occupancy.moveNeedleTo( occupancy_stat );
-		uncoalesced.moveNeedleTo( occupancy_stat );
-		conflicts.moveNeedleTo( occupancy_stat );
+		uncoalesced.moveNeedleTo( uncoalesced_stat );
+		conflicts.moveNeedleTo( conflicts_stat );
+	}
+	
+	public static void MarkChart( double exec_time ) {
+		MainWindow.execution_times.add( exec_time );
+		double plot[] = new double [ MainWindow.execution_times.size() ];
+		Iterator<Double> iter = MainWindow.execution_times.iterator();
+		for ( int i = 0; i < MainWindow.execution_times.size(); i++ )
+			plot[i] = iter.next();
+		ISeries series = MainWindow.history.getSeriesSet().createSeries( SeriesType.LINE, "history" );
+		series.setYSeries( plot );
+		
+		if ( MainWindow.execution_times.size() > 1 )
+			MainWindow.history.getAxisSet().adjustRange();
 	}
 }
 	
