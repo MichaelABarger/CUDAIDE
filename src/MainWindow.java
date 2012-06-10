@@ -156,7 +156,8 @@ public class MainWindow {
 		lblPtxAssemblerBreakdown.setFont(SWTResourceManager.getFont("Segoe UI",7, SWT.NORMAL));
 
 		ppCUDACode = new CUDACode(shlSwtApplication, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
-		ppCUDACode.setMarginColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+		ppCUDACode.setFont(SWTResourceManager.getFont("Segoe UI", 8, SWT.NORMAL));
+		ppCUDACode.setMarginColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		ppCUDACode.setLeftMargin(50);
 		ppCUDACode.setTabs(3);
 		ppCUDACode.setDoubleClickEnabled(false);
@@ -183,7 +184,7 @@ public class MainWindow {
 		gd_table.heightHint = 166;
 		gd_table.widthHint = 375;
 		table.setLayoutData(gd_table);
-		table.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		table.setFont(SWTResourceManager.getFont("Segoe UI", 8, SWT.NORMAL));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
@@ -315,6 +316,7 @@ public class MainWindow {
 		MainWindow.btnRecompile.setEnabled( false );
 		/*************** compile CU into commented PTX *****************/
 		// build command line and execute
+		
 		ArrayList<String> command = new ArrayList<String>(Arrays.asList(
 				"nvcc", "-ptx", "-Xopencc=\"-LIST:source=on\" -O0",
 				"-Xptxas=-O0"));
@@ -324,6 +326,7 @@ public class MainWindow {
 		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
 		
+		/*
 		Process cur_p = cur_pb.start();
 
 		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
@@ -335,7 +338,7 @@ public class MainWindow {
 				err += err_in;
 			throw new IOException("Compile failed: " + err);
 		}
-		
+		*/
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
@@ -345,7 +348,7 @@ public class MainWindow {
 			throw new IOException(PTXpath.getPath() + " does not exist!");
 		ppPTXScanner = new PTXScanner(); 
 		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-		PTXpath.deleteOnExit();
+		//PTXpath.deleteOnExit();
 		
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
@@ -361,6 +364,7 @@ public class MainWindow {
 		env.put("COMPUTE_PROFILE_CONFIG", "config");
 		cur_pb.redirectErrorStream();
 		
+		/*
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
@@ -371,12 +375,12 @@ public class MainWindow {
 		}
 
 		System.out.println(in);
-
+		
 		command.clear();
 		command.addAll(Arrays.asList("time", "./test/a.out"));
 		command.addAll(Arrays.asList(args));
 		cur_pb = new ProcessBuilder(command);
-
+		
 		cur_pb.redirectErrorStream();
 		cur_p = cur_pb.start();
 		
@@ -389,7 +393,7 @@ public class MainWindow {
 			if(err_in.contains("user"))
 				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
 		}
-		
+		*/
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
 		String cudacode_in;
@@ -399,8 +403,10 @@ public class MainWindow {
 		ppCUDACode.resetCaret();
 
 		CUcode.close();		
-		pMap = new ProfileMap("cudaide.log");
-		ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
+		
+		//pMap = new ProfileMap("cudaide.log");
+		//ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
+		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
@@ -413,8 +419,9 @@ public class MainWindow {
 			// do nothing--no sound is okay, too
 		}
 //		System.out.println("" + dataPoint);
-		if(dataPoint != 0)
-			MarkChart( dataPoint );
+		//if(dataPoint != 0)
+		//	MarkChart( dataPoint );
+		MarkChart( (int)(Math.random() * 100) );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		
@@ -426,7 +433,7 @@ public class MainWindow {
 	}
 	
 	public static void MarkChart( double exec_time ) {
-		MainWindow.execution_times.add( exec_time );
+		MainWindow.execution_times.add( -exec_time );
 		double plot[] = new double [ MainWindow.execution_times.size() ];
 		Iterator<Double> iter = MainWindow.execution_times.iterator();
 		for ( int i = 0; i < MainWindow.execution_times.size(); i++ )
