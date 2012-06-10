@@ -368,7 +368,7 @@ public class MainWindow {
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
 		command.clear();
-		command.addAll(Arrays.asList("nvcc", "-run"));
+		command.addAll(Arrays.asList("time", "nvcc", "-run"));
 		command.addAll(Arrays.asList(args));
 		// execute NVCC and run the program
 		cur_pb = new ProcessBuilder(command);
@@ -386,9 +386,18 @@ public class MainWindow {
 				cur_p.getErrorStream()));
 		String in = "";
 		String in_in;
-		while ((in_in = stdin.readLine()) != null)
+		String err = "";
+		String err_in;
+		while ((in_in = stdin.readLine()) != null){
 			in += in_in;
+		}
+		double dataPoint = 0.0; 
+		while ((err_in = stderr.readLine()) != null){
+			if(err_in.contains("user"))
+				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
+		}
 		System.out.println(in);
+		System.out.println(err);
 		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
@@ -412,8 +421,8 @@ public class MainWindow {
 		} catch ( Exception ex ) {
 			// do nothing--no sound is okay, too
 		}
-		
-		MarkChart( Math.random() * 25 );
+		if(dataPoint != 0)
+			MarkChart( dataPoint );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		
