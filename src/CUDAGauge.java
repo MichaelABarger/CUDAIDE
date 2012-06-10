@@ -45,19 +45,23 @@ public class CUDAGauge extends Canvas {
 		this.graphics = new GC( this );
 		this.tweening = false;
 		
-		this.clear_x = 0;
-		this.clear_y = 0;
-		this.clear_width = CUDAGauge.width;
-		this.clear_height = CUDAGauge.height;
+		resetClears();
 		
 		this.setNeedle( 50 );
 		
 		this.addPaintListener( new PaintListener() {
 			public void paintControl(PaintEvent e) {
+				CUDAGauge.this.resetClears();
 				CUDAGauge.this.draw();
 			}
-		
 		});
+	}
+	
+	private void resetClears() {
+		this.clear_x = 0;
+		this.clear_y = 0;
+		this.clear_width = CUDAGauge.width;
+		this.clear_height = CUDAGauge.height;
 	}
 
 	
