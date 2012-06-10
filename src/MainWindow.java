@@ -240,34 +240,35 @@ public class MainWindow {
 		
 		btnRecompile.addMouseListener(new MouseAdapter() {
 			
-			
-			
 			public void mouseDown(MouseEvent e) {
-				
-				MainWindow.btnRecompile.setEnabled( false );
-				
-				String [] compileArgs = new String[1];
-				compileArgs[0] = MainWindow.CUpath.getPath();
-				try {
-					//MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
-					MainWindow.compile( compileArgs );
-					MainWindow.btnRecompile.setEnabled( true );
-					
-				} catch (Exception x) {
-					/*
-					 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
-					 * "Fatal Error" ); mb.setMessage( e.getMessage() ); mb.open();
-					 */
-					
-//					System.out.println(MainWindow.cur_pb.directory());			
-//					System.out.println(MainWindow.cur_pb.environment());			
-//					System.out.println(MainWindow.cur_pb.command());
-
-					System.err.println(x.getMessage());
-					MainWindow.display.dispose();
-					System.exit(1);
-				} finally {
-
+				if ( MainWindow.btnRecompile.isEnabled() ) {
+					try {
+						//MainWindow.ppCUDACode.save(MainWindow.CUpath.getPath());
+			            Display.getCurrent().asyncExec(new Runnable() {
+			               public void run() {
+			                  try {
+			                	  MainWindow.compile( new String[] { MainWindow.CUpath.getPath() } );
+			                  } catch (Exception e) {
+			                  }
+			               }
+			            });
+						
+					} catch (Exception x) {
+						/*
+						 * MessageBox mb = new MessageBox( shell, SWT.OK ); mb.setText(
+						 * "Fatal Error" ); mb.setMessage( e.getMessage() ); mb.open();
+						 */
+						
+	//					System.out.println(MainWindow.cur_pb.directory());			
+	//					System.out.println(MainWindow.cur_pb.environment());			
+	//					System.out.println(MainWindow.cur_pb.command());
+	
+						System.err.println(x.getMessage());
+						MainWindow.display.dispose();
+						System.exit(1);
+					} finally {
+	
+					}
 				}
 			}
 			
@@ -328,6 +329,7 @@ public class MainWindow {
 
 	public static void compile( String [] args ) throws IOException, InterruptedException
 	{
+		MainWindow.btnRecompile.setEnabled( false );
 		/*************** compile CU into commented PTX *****************/
 		// build command line and execute
 		ArrayList<String> command = new ArrayList<String>(Arrays.asList(
@@ -410,7 +412,8 @@ public class MainWindow {
 			// do nothing--no sound is okay, too
 		}
 		
-		MarkChart( (int)(Math.random() * 100) );
+		MarkChart( Math.random() );
+		MainWindow.btnRecompile.setEnabled( true );
 	}
 		
 	public static void ChangeGauges( int occupancy_stat, int uncoalesced_stat, int conflicts_stat ) // each 0~100
@@ -429,8 +432,8 @@ public class MainWindow {
 		ISeries series = MainWindow.history.getSeriesSet().createSeries( SeriesType.LINE, "history" );
 		series.setYSeries( plot );
 		
-		if ( MainWindow.execution_times.size() > 1 )
-			MainWindow.history.getAxisSet().adjustRange();
+		MainWindow.history.getAxisSet().adjustRange();
+		
 	}
 }
 	
