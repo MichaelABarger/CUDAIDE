@@ -1,16 +1,4 @@
-gridsize3d
-threadblocksize
-stasmemperblock
-dynmemperblock
-regperthread
-memtransferdir
-memtransfersize
-memtransferhostmemtype
-cacheconfigrequested
-cacheconfigexecuted
-countermodeaggregate
-
-warp_serialize
 gld_incoherent
 gst_incoherent
 gld_coherent
+local_load
