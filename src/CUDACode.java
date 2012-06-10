@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.TableItem;
 					prev_line = cur_line;
 				}
 				MainWindow.table.removeAll();
-				if(cur_line < MainWindow.ppPTXScanner.getScope()) {
+				if(MainWindow.ppPTXScanner.inScope(cur_line + 1)) {
 					CUDACode.this.arrow_visible = true;
 					ChangeTable(cur_line + 1);
 				} else
