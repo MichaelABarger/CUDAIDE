@@ -372,9 +372,8 @@ public class MainWindow {
 		}
 
 		System.out.println(in);
-		
 		command.clear();
-		command.addAll(Arrays.asList("time", "./test/a.out"));
+		command.addAll(Arrays.asList("time", CUpath.getParent() + "/a.out"));
 		command.addAll(Arrays.asList(args));
 		cur_pb = new ProcessBuilder(command);
 		
@@ -385,10 +384,12 @@ public class MainWindow {
 				cur_p.getErrorStream()));
 		String err = "";
 		String err_in;
-		double dataPoint = 0.0; 
+		double dataPoint = 0; 
 		while ((err_in = stderr.readLine()) != null){
-			if(err_in.contains("user"))
-				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
+			if(err_in.contains("user")){
+				System.out.println(err_in + '\n');
+				dataPoint = Double.parseDouble(err_in.substring(0, err_in.indexOf("user")));
+			}
 		}
 		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
@@ -403,7 +404,6 @@ public class MainWindow {
 		
 		pMap = new ProfileMap("cudaide.log");
 		ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
-		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
@@ -416,9 +416,8 @@ public class MainWindow {
 			// do nothing--no sound is okay, too
 		}
 		System.out.println("" + dataPoint);
-		if(dataPoint != 0)
-			MarkChart( dataPoint );
-		MarkChart( (int)(Math.random() * 100) );
+		if(dataPoint > 0)
+			MarkChart( 0 -(dataPoint) );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		

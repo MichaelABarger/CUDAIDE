@@ -16,9 +16,9 @@ unsigned char *d_next;
 size_t next_pitch;
 
 // set the grid/block dimensions for kernel execution
-const dim3 gridDim(2, 2, 1);
-const dim3 blocksDim(2, 2, 1); // 256 threads per block
-const size_t sharedmem_size = (16) * (16);
+const dim3 gridDim(16, 16, 1);
+const dim3 blocksDim(10, 10, 1); 
+const size_t sharedmem_size = (10) * (10);
 
 extern __shared__ unsigned char local_current [];
 
