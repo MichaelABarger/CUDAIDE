@@ -325,8 +325,6 @@ public class MainWindow {
 
 		ProcessBuilder cur_pb = new ProcessBuilder(command);
 
-		
-		/*
 		Process cur_p = cur_pb.start();
 
 		if (cur_p.waitFor() != 0) { // if NVCC compilation fails . . .
@@ -338,7 +336,7 @@ public class MainWindow {
 				err += err_in;
 			throw new IOException("Compile failed: " + err);
 		}
-		*/
+		
 
 		// create File object for the newly-generated PTX file and make it
 		// temporary
@@ -348,7 +346,7 @@ public class MainWindow {
 			throw new IOException(PTXpath.getPath() + " does not exist!");
 		ppPTXScanner = new PTXScanner(); 
 		ppPTXScanner.readIn(CUpath.getPath(), PTXpath.getPath());
-		//PTXpath.deleteOnExit();
+		PTXpath.deleteOnExit();
 		
 		/**************** compile CU again into executable and run it for profiling ********************/
 		// set up command line
@@ -364,7 +362,6 @@ public class MainWindow {
 		env.put("COMPUTE_PROFILE_CONFIG", "config");
 		cur_pb.redirectErrorStream();
 		
-		/*
 		cur_p = cur_pb.start();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				cur_p.getInputStream()));
@@ -375,24 +372,26 @@ public class MainWindow {
 		}
 
 		System.out.println(in);
-		
 		command.clear();
-		command.addAll(Arrays.asList("time", "./test/a.out"));
+		command.addAll(Arrays.asList("time", CUpath.getParent() + "/a.out"));
 		command.addAll(Arrays.asList(args));
 		cur_pb = new ProcessBuilder(command);
 		
 		cur_pb.redirectErrorStream();
+		cur_p = cur_pb.start();
 		
 		BufferedReader stderr = new BufferedReader(new InputStreamReader(
 				cur_p.getErrorStream()));
 		String err = "";
 		String err_in;
-		double dataPoint = 0.0; 
+		double dataPoint = 0; 
 		while ((err_in = stderr.readLine()) != null){
-			if(err_in.contains("user"))
-				dataPoint = Float.parseFloat(err_in.substring(0, err_in.indexOf("user")));
+			if(err_in.contains("user")){
+				System.out.println(err_in + '\n');
+				dataPoint = Double.parseDouble(err_in.substring(0, err_in.indexOf("user")));
+			}
 		}
-		*/
+		
 		BufferedReader CUcode = new BufferedReader(new FileReader(CUpath));
 		String cudacode = "";
 		String cudacode_in;
@@ -403,9 +402,8 @@ public class MainWindow {
 
 		CUcode.close();		
 		
-		//pMap = new ProfileMap("cudaide.log");
-		//ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
-		ChangeGauges( (int)(Math.random() * 100), (int)(Math.random() * 100), (int)(Math.random() * 100));
+		pMap = new ProfileMap("cudaide.log");
+		ChangeGauges( (int)(pMap.average("occupancy") * 100.0), (int)((1.0 - (pMap.average("gld_incoherent") / (pMap.average("gld_incoherent") + pMap.average("gld_coherent")))) * 100.0), (int)((1 - (pMap.average("warp_serialize") / pMap.average("instructions"))) * 100.0));
 		// play sound
 		try {
 			AudioInputStream au = AudioSystem.getAudioInputStream( MainWindow.ding );
@@ -417,10 +415,9 @@ public class MainWindow {
 		} catch ( Exception ex ) {
 			// do nothing--no sound is okay, too
 		}
-//		System.out.println("" + dataPoint);
-		//if(dataPoint != 0)
-		//	MarkChart( dataPoint );
-		MarkChart( (int)(Math.random() * 100) );
+		System.out.println("" + dataPoint);
+		if(dataPoint > 0)
+			MarkChart( 0 -(dataPoint) );
 		MainWindow.btnRecompile.setEnabled( true );
 	}
 		

@@ -68,9 +68,9 @@ import org.eclipse.swt.widgets.TableItem;
 				for(int j = 0; j < w; j++){
 					data = new String[5];
 					TableItem tblInstructions = new TableItem(MainWindow.table, SWT.NONE);
-					for(int i = 0; i < 4; i++){
-						data[i + 1] = MainWindow.ppPTXScanner.getArg(n, j, i);
-						if(data[i + 1] == null) data[i + 1] = " ";
+					for(int i = 0; i < 5; i++){
+						data[i] = MainWindow.ppPTXScanner.getArg(n, j, i);
+						if(data[i] == null) data[i] = " ";
 					}
 					tblInstructions.setText(data);	
 				}
