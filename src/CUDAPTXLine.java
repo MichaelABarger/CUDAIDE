@@ -19,7 +19,7 @@ class CUDAPTXLine {
 	String uncommentedSource;
 	String PTXInstruction[];
 	int Cycles[];
-	Integer Cycle_Sum = 0;
+	int Cycle_Sum = 0;
 	String InstructionToken[];
 	String Arg1[];
 	String Arg2[];
@@ -153,6 +153,8 @@ class CUDAPTXLine {
 			return Arg2[q];
 		case 4:
 			return Arg3[q];
+		case 5:
+		  return Integer.toString(Cycle_Sum);
 		default:
 			return null;
 		}

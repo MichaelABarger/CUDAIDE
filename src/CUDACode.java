@@ -5,25 +5,36 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import java.io.*;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 	public final class CUDACode extends StyledText {
 
 		public static boolean arrow_visible = false;
+		private GC gc;
+		private Font font;
+		private boolean ready = false;
 	
 		public CUDACode(Composite parent, int style) {
 			super(parent, style);
 			addCaretListener(new CUDACaretListener());
 			addPaintListener(new CUDAPaintListener());
+			this.gc = new GC( this );
+			this.font = SWTResourceManager.getFont("Segoe UI", 8, SWT.NORMAL);
+			
 		}
 		
 		public void resetCaret() {
 			this.setCaretOffset( 100 );
 			this.setCaretOffset( 0 );
+			this.ready = true;
+			this.redraw();
 		}
 		
 		public class CUDACaretListener implements CaretListener {
@@ -97,6 +108,7 @@ import org.eclipse.swt.widgets.TableItem;
 					int caret_pos = MainWindow.ppCUDACode.getCaretOffset();
 					int cur_line = MainWindow.ppCUDACode.getLineAtOffset( caret_pos );
 					int line_pixel = MainWindow.ppCUDACode.getLinePixel( cur_line );
+					final int line_height = MainWindow.ppCUDACode.getLineHeight();
 					Rectangle bounds = MainWindow.ppCUDACode.getBounds();
 					Rectangle client = MainWindow.ppCUDACode.getClientArea();
 					
@@ -107,15 +119,35 @@ import org.eclipse.swt.widgets.TableItem;
 						y2 = bounds.height;
 					} else {
 						y1 = line_pixel + 1;
-						y2 = y1 + MainWindow.ppCUDACode.getLineHeight( cur_line );
+						y2 = y1 + line_height;
 					}
 					MainWindow.arrow_canvas.drawArrow( y1, y2 );
+					
+					// clear text
+					gc.setBackground( CUDACode.this.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW) );
+					gc.setForeground( CUDACode.this.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW) );
+					gc.fillRectangle( client.x, client.y, MainWindow.ppCUDACode.getLeftMargin(), client.height );
+					gc.setFont( CUDACode.this.font );
+          gc.setForeground(CUDACode.this.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+          gc.setAntialias( SWT.ON );
+					int cur_x = 5;
+					// and draw text
+					for ( int cur_y = 0; cur_y < client.height; cur_y += line_height ) {
+					    cur_line = MainWindow.ppCUDACode.getLineIndex( cur_y );
+					    if(MainWindow.ppCUDACode.ready && MainWindow.ppPTXScanner.inScope(cur_line + 1)) {
+					         if ( MainWindow.ppPTXScanner.instructions( cur_line + 1 ) > 0 ) continue;
+					         String cycle_sum = MainWindow.ppPTXScanner.getArg(cur_line + 1, 0, 5);
+					         if ( cycle_sum == null ) cycle_sum = "";
+					         gc.drawString(cycle_sum, cur_x, cur_y );
+					    }
+					}
+					gc.setAntialias( SWT.OFF );
 				}
 			}
 			
 			public void finalize () throws Throwable {
 				try {
-					// nothing
+				    gc.dispose();
 				} catch ( Throwable e ) {
 				} finally {
 					super.finalize();
