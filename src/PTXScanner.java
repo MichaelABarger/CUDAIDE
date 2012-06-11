@@ -21,8 +21,7 @@ public class PTXScanner {
 	public String getArg(int ln, int in, int an)
 	{
 		if(lnLookup(ln) != null){
-			if(an == 0) return lnLookup(ln).getInstruction(in);
-			else return lnLookup(ln).getArg(in, an);
+			return lnLookup(ln).getArg(in, an);
 		}
 		return null;
 	}

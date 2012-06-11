@@ -18,7 +18,7 @@ class CUDAPTXLine {
 	String commentedSource;
 	String uncommentedSource;
 	String PTXInstruction[];
-	Integer Cycles[];
+	int Cycles[];
 	Integer Cycle_Sum = 0;
 	String InstructionToken[];
 	String Arg1[];
@@ -75,7 +75,6 @@ class CUDAPTXLine {
 		inst_cycles.put( "ld.global", new Integer(443) );
 	}
 	
-	
 	CUDAPTXLine() {
 		numPTXInstructions = 0;
 		commentedSource = null;
@@ -88,7 +87,7 @@ class CUDAPTXLine {
 
 	void declarePTXInstructionCount(int count) {
 		PTXInstruction = new String[count];
-		Cycles = new Integer[count];
+		Cycles = new int[count];
 		InstructionToken = new String[count];
 		Arg1 = new String[count];
 		Arg2 = new String[count];
@@ -145,12 +144,14 @@ class CUDAPTXLine {
 	public String getArg(int q, int argNum){
 		switch(argNum){
 		case 0:
-			return Cycles[q].toString();
+			return Integer.toString(Cycles[q]);
 		case 1:
-			return Arg1[q];
+			return InstructionToken[q];
 		case 2:
-			return Arg2[q];
+			return Arg1[q];
 		case 3:
+			return Arg2[q];
+		case 4:
 			return Arg3[q];
 		default:
 			return null;
@@ -178,14 +179,15 @@ class CUDAPTXLine {
 					}
 					
 				}
-				if ( InstructionToken[i] != null && Cycles[i] != null ) {
+				if ( InstructionToken[i] != null) {
 					Enumeration<String> keys = CUDAPTXLine.inst_cycles.keys();
 					while ( keys.hasMoreElements() ) {
 						String this_element = keys.nextElement();
 						if ( InstructionToken[i].contains( this_element ) ) {
 							Cycles[i] = CUDAPTXLine.inst_cycles.get( this_element );
+							System.out.println(InstructionToken[i] + ": " + Cycles[i]);
 						}
-					}
+					} 
 					if ( Cycles[i] == 0 )
 						Cycles[i] = 24;
 					Cycle_Sum += Cycles[i];
@@ -194,7 +196,7 @@ class CUDAPTXLine {
 		}	
 	}
 	
-int getLineNumber(){
+	int getLineNumber(){
 		return lineNumber;
 	}
 }
