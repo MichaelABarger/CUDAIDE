@@ -185,7 +185,6 @@ class CUDAPTXLine {
 						String this_element = keys.nextElement();
 						if ( InstructionToken[i].contains( this_element ) ) {
 							Cycles[i] = CUDAPTXLine.inst_cycles.get( this_element );
-							System.out.println(InstructionToken[i] + ": " + Cycles[i]);
 						}
 					} 
 					if ( Cycles[i] == 0 )
